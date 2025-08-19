@@ -1,27 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Deno.Services;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 namespace Deno.Views
 {
     public partial class HomePage : Page
     {
         public string WelcomeText { get; set; }
+        private readonly CurrencyService _currencyService;
 
-        public HomePage(string username)
+        public HomePage(string username, CurrencyService currencyService)
         {
             InitializeComponent();
             WelcomeText = $"Welcome, {username}!";
-            DataContext = this;
+            _currencyService = currencyService;
+            DataContext = _currencyService;
+            this.SetValue(WelcomeTextProperty, WelcomeText);
         }
+
+        public static readonly DependencyProperty WelcomeTextProperty =
+            DependencyProperty.Register("WelcomeText", typeof(string), typeof(HomePage), new PropertyMetadata(string.Empty));
+
+        public ICommand UpdateTotalsCommand => new RelayCommand(UpdateTotals);
+
+        private void UpdateTotals(object parameter)
+        {
+            _currencyService.OnPropertyChanged(nameof(CurrencyService.CoinViewModels));
+            _currencyService.OnPropertyChanged(nameof(CurrencyService.NoteViewModels));
+        }
+    }
+
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Func<object, bool> _canExecute;
+
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+        public void Execute(object parameter) => _execute(parameter);
     }
 }

@@ -3,6 +3,11 @@ using Deno.Views;
 using System;
 using System.Windows;
 
+using Deno.Services;
+using Deno.Views;
+using System;
+using System.Windows;
+
 namespace Deno
 {
     public partial class App : Application
@@ -35,7 +40,6 @@ namespace Deno
             {
                 Console.WriteLine($"Startup error: {ex.Message}\nStackTrace: {ex.StackTrace}");
                 MessageBox.Show($"Startup error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Optionally open LoginWindow on error
                 LoginWindow login = new LoginWindow();
                 login.Show();
             }

@@ -102,8 +102,8 @@ namespace Deno.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to save settings: {ex.Message}");
-                System.Windows.MessageBox.Show($"Failed to save settings: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                Console.WriteLine($"Failed to save settings: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                throw; // Re-throw to let caller handle
             }
         }
 
@@ -153,7 +153,7 @@ namespace Deno.Services
                 Username = "";
                 UserId = "";
                 Auth = "";
-                System.Windows.MessageBox.Show($"Failed to load settings: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                throw; // Re-throw to let caller handle
             }
         }
     }

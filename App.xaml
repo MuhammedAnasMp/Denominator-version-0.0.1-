@@ -2,8 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Deno"
-             StartupUri="MainWindow.xaml">
+           >
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <SolidColorBrush x:Key="TextColor" Color="#2D3436"/>
+            <SolidColorBrush x:Key="FooterBackground" Color="#F5F7FA"/>
+            <SolidColorBrush x:Key="AccentColor" Color="#0984E3"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

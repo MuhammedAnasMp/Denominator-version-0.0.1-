@@ -1,11 +1,124 @@
 ﻿<Page x:Class="Deno.Views.HomePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="HomePage">
-
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Deno.Behaviors"
+      xmlns:services="clr-namespace:Deno.Services"
+      mc:Ignorable="d">
     <Grid>
-        <TextBlock Text="{Binding WelcomeText}" 
-                   FontSize="24" 
-                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Welcome Label -->
+        <!-- Welcome Label - Bind to the Page's WelcomeText property -->
+        <TextBlock Grid.Row="0"
+                   Text="{Binding ElementName=HomePageRoot, Path=WelcomeText}"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource TextColor}"
+                   HorizontalAlignment="Left"
+                   Margin="10"/>
+
+        <!-- Currency Selection -->
+     
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header Labels -->
+                <TextBlock Text="Coins" Grid.Row="0" Grid.Column="0" FontSize="14" HorizontalAlignment="Center"/>
+                <TextBlock Text="Notes" Grid.Row="0" Grid.Column="2" FontSize="14" HorizontalAlignment="Center"/>
+
+                <!-- Vertical Separator -->
+                <Rectangle Fill="White" Width="1" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Stretch"/>
+
+                <!-- Coins Section -->
+                <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding CoinViewModels}" Margin="10">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F2}'}" VerticalAlignment="Center" Margin="5"/>
+                                <TextBox Grid.Column="1" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="200" VerticalAlignment="Center" Margin="5">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=DataContext.UpdateTotalsCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
+                                    </TextBox.InputBindings>
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0:F2}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Notes Section -->
+                <ItemsControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding NoteViewModels}" Margin="10">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F2}'}" VerticalAlignment="Center" Margin="5"/>
+                                <TextBox Grid.Column="1" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="200" VerticalAlignment="Center" Margin="5">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=DataContext.UpdateTotalsCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
+                                    </TextBox.InputBindings>
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0:F2}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Totals and Buttons Section -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Background="{DynamicResource FooterBackground}">
+            <TextBlock Text="{Binding CoinTotal, StringFormat='Coins: {0:F2}'}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextColor}" Margin="10"/>
+            <TextBlock Text="{Binding NoteTotal, StringFormat='Notes: {0:F2}'}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextColor}" Margin="10"/>
+            <TextBlock Text="{Binding GrandTotal, StringFormat='Total: {0:F2}'}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AccentColor}" Margin="10"/>
+            <Button Content="Reset All" Command="{Binding ResetCommand}" Width="160" Height="48" Margin="5" FontSize="16" FontWeight="Bold"/>
+            <Button Content="Submit" Command="{Binding PostToApiCommand}" Width="160" Height="48" Margin="5" FontSize="16" FontWeight="Bold"/>
+        </StackPanel>
     </Grid>
 </Page>

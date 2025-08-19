@@ -27,9 +27,9 @@ namespace Deno.Views
         {
             InitializeComponent();
             _auth = auth;
-
-            // Load pages into frames
-            HomeFrame.Content = new HomePage(username);
+            var currencyService = new CurrencyService();
+        
+            HomeFrame.Content = new HomePage(username , currencyService);
             ManageFrame.Content = new ManagePage();
             ConfigFrame.Content = new ConfigPage();
 
