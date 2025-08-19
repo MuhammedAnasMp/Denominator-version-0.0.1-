@@ -1,4 +1,5 @@
 ﻿<Page x:Class="Deno.Views.HomePage"
+      x:Name="HomePageRoot"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,15 +15,13 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Welcome Label -->
-        <!-- Welcome Label - Bind to the Page's WelcomeText property -->
         <TextBlock Grid.Row="0"
-                   Text="{Binding ElementName=HomePageRoot, Path=WelcomeText}"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   Foreground="{DynamicResource TextColor}"
-                   HorizontalAlignment="Left"
-                   Margin="10"/>
+           Text="{Binding WelcomeText, ElementName=HomePageRoot}"
+           FontSize="16"
+           FontWeight="Bold"
+           Foreground="{DynamicResource TextColor}"
+           HorizontalAlignment="Left"
+           Margin="10"/>
 
         <!-- Currency Selection -->
      
