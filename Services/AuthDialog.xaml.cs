@@ -1,38 +1,38 @@
-﻿// Add this class to your project
-using System.Windows;
+﻿using System.Windows;
 
 namespace Deno.Services
 {
-    // Update the AuthDialog class
-public partial class AuthDialog : Window
-{
-    public string Username { get; set; }
-    public string Password => PasswordBox.Password; // Expose the password
-    public bool IsAuthenticated { get; private set; }
-
-    public AuthDialog()
+    public partial class AuthDialog : Window
     {
-        InitializeComponent();
-        DataContext = this;
-    }
+        // Expose the hidden ID and password
+        public string Id => IdBox.Password;
+        public string Password => PasswordBox.Password;
 
-    private void Login_Click(object sender, RoutedEventArgs e)
-    {
-        if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+        public bool IsAuthenticated { get; private set; }
+
+        public AuthDialog()
         {
-            IsAuthenticated = true;
-            DialogResult = true;
+            InitializeComponent();
         }
-        else
-        {
-            MessageBox.Show("Please enter both username and password.");
-        }
-    }
 
-    private void Cancel_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = false;
-        Close();
+        private void Login_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(Id) && !string.IsNullOrEmpty(Password))
+            {
+                // Optionally: add your authentication logic here
+                IsAuthenticated = true;
+                DialogResult = true;
+            }
+            else
+            {
+                MessageBox.Show("Please enter both ID and password.", "Authorization Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
+        }
     }
-}
 }

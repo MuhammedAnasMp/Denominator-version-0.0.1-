@@ -182,29 +182,34 @@ namespace Deno.Services
         {
             try
             {
-                // Show authentication dialog
-                var authDialog = new AuthDialog();
-                if (authDialog.ShowDialog() != true)
-                {
-                    MessageBox.Show("Authentication cancelled.");
-                    return;
-                }
+               
 
-                // Get password from the PasswordBox (you'll need to modify AuthDialog to expose this)
-                string password = authDialog.Password; // You'll need to implement this properly
+                //// Show authentication dialog
+                //var authDialog = new AuthDialog();
+                //if (authDialog.ShowDialog() != true)
+                //{
+                //    MessageBox.Show("Authentication cancelled.");
+                //    return;
+                //}
 
-                // First, validate the manager credentials
-                string isValid = await ValidateManagerCredentials(authDialog.Username, password);
+                //// Get password from the PasswordBox (you'll need to modify AuthDialog to expose this)
+                //string password = authDialog.Password; // You'll need to implement this properly
 
-                // FIX: Use != instead of !== for C#
-                if (isValid == "false")
-                {
-                    MessageBox.Show("Authentication failed. Invalid manager credentials.");
-                    return;
-                }
+                //// First, validate the manager credentials
+                //string isValid = await ValidateManagerCredentials(authDialog.Id, password);
+
+                //// FIX: Use != instead of !== for C#
+                //if (isValid == "false")
+                //{
+                //    MessageBox.Show("Authentication failed. Invalid manager credentials.");
+                //    return;
+                //}
 
                 // If authentication successful, post the data
-                await PostDenominationData(isValid);
+                //await PostDenominationData(isValid);
+
+                await PostDenominationData();
+
             }
             catch (Exception ex)
             {
@@ -227,8 +232,8 @@ namespace Deno.Services
 
                     var json = JsonSerializer.Serialize(authData);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    var response = await client.PostAsync("http://localhost:8000/void_id_validation", content);
+                    var host = GlobalStateService.Instance.DomainName;
+                    var response = await client.PostAsync($"http://{host}/void_id_validation", content);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -253,7 +258,9 @@ namespace Deno.Services
             }
         }
 
-        private async Task PostDenominationData(string countedBy)
+        private async Task PostDenominationData()
+        //private async Task PostDenominationData(string countedBy)
+
         {
             try
             {
@@ -277,7 +284,7 @@ namespace Deno.Services
                         CoinTotal = CoinTotal,
                         NoteTotal = NoteTotal,
                         GrandTotal = GrandTotal,
-                        CountedBy = countedBy,
+                        //CountedBy = countedBy,
                         Timestamp = DateTime.UtcNow,
                         PosNumber = GlobalStateService.Instance.PosNumber,
                         LocCode = GlobalStateService.Instance.LocCode,
@@ -287,16 +294,26 @@ namespace Deno.Services
 
                     };
 
+                    if (postData.GrandTotal == 0)
+                    {
+                        MessageBox.Show("Please enter the quantity for each coin and note.",
+                                        "Grand Total Cannot Be Zero",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Warning);
+                        return ;
+                        
+                    }
+
                     var json = JsonSerializer.Serialize(postData, new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                     });
-
+                  
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    // Replace with your actual API endpoint
-                    var response = await client.PostAsync("http://localhost:8000/api/denominations", content);
-
+                    var host = GlobalStateService.Instance.DomainName;
+                  
+                    var response = await client.PostAsync($"http://{host}/api/denominations", content);
+                 
                     if (response.IsSuccessStatusCode)
                     {
                         MessageBox.Show("Data posted successfully!");

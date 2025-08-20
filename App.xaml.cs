@@ -18,13 +18,9 @@ namespace Deno
 
             try
             {
-                // Load settings into GlobalStateService
                 GlobalStateService.Instance.LoadSettings();
 
-                // Log the IsLoggedIn state for debugging
-                Console.WriteLine($"IsLoggedIn at startup: {GlobalStateService.Instance.IsLoggedIn}, Auth: {GlobalStateService.Instance.Auth}");
-
-                // Check if user is logged in
+             
                 if (GlobalStateService.Instance.IsLoggedIn)
                 {
                     HomeWindow home = new HomeWindow(GlobalStateService.Instance.Username, GlobalStateService.Instance.Auth);

@@ -17,11 +17,7 @@ namespace Deno.Views
             // Set selected item based on loaded CurrencyCode
             CurrencyPicker.SelectedItem = GlobalStateService.Instance.CurrencyCode ?? "AED";
 
-            // Log initial values for debugging
-            Console.WriteLine($"ConfigPage initialized: LocCode={GlobalStateService.Instance.LocCode}, " +
-                              $"PosNumber={GlobalStateService.Instance.PosNumber}, " +
-                              $"DomainName={GlobalStateService.Instance.DomainName}, " +
-                              $"CurrencyCode={GlobalStateService.Instance.CurrencyCode}");
+      
         }
 
         private void CurrencyPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -45,7 +41,24 @@ namespace Deno.Views
 
                 // Save settings to JSON file
                 GlobalStateService.Instance.SaveSettings();
-                MessageBox.Show("Configuration saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                if (GlobalStateService.Instance.Auth == "config")
+                {
+                    GlobalStateService.Instance.IsLoggedIn = false;
+                    GlobalStateService.Instance.Username = "";
+                    GlobalStateService.Instance.UserId = "";
+                    GlobalStateService.Instance.Auth = "";
+                    GlobalStateService.Instance.SaveSettings();
+                    LoginWindow login = new LoginWindow();
+                    login.Show();
+                    Window.GetWindow(this)?.Close();
+
+                     MessageBox.Show("Configuration set successfully! Please login as a user .", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Configuration saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
             catch (Exception ex)
             {

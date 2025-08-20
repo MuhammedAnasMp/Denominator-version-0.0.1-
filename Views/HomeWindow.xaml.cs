@@ -28,12 +28,18 @@ namespace Deno.Views
             InitializeComponent();
             _auth = auth;
             var currencyService = new CurrencyService();
-        
-            HomeFrame.Content = new HomePage(username , currencyService);
-            ManageFrame.Content = new ManagePage();
-            ConfigFrame.Content = new ConfigPage();
 
-            // Role-based tab visibility
+            if (auth == "config")
+            {
+                HomeFrame.Content = new ConfigPage();
+            }
+            else
+            {
+                HomeFrame.Content = new HomePage(username, currencyService);
+                ManageFrame.Content = new ManagePage();
+                ConfigFrame.Content = new ConfigPage();
+            }
+
             SetTabVisibility(GlobalStateService.Instance.Auth);
         }
 
@@ -57,6 +63,12 @@ namespace Deno.Views
                     HomeTab.Visibility = Visibility.Visible;
                     ManageTab.Visibility = Visibility.Visible;
                     ConfigTab.Visibility = Visibility.Visible;
+                    break;
+
+                case "config":
+                    HomeTab.Visibility = Visibility.Visible;
+                    ManageTab.Visibility = Visibility.Collapsed;
+                    ConfigTab.Visibility = Visibility.Collapsed;
                     break;
 
                 default:

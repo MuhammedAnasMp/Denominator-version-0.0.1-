@@ -5,136 +5,340 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Deno.Behaviors"
-      xmlns:services="clr-namespace:Deno.Services"
       mc:Ignorable="d">
-    
-    <Grid>
+
+    <!-- Background Gradient -->
+    <Page.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="White" Offset="0"/>
+            <GradientStop Color="White" Offset="1"/>
+        </LinearGradientBrush>
+    </Page.Background>
+
+    <Page.Resources>
+        <!-- Card Style (lighter, less padding, no strong shadow) -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="8"/>
+           
+        </Style>
+
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#4f46e5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3730a3"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#312e81"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Danger Button -->
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#ef4444"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#dc2626"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#b91c1c"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Success Button -->
+        <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#10b981"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#059669"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#047857"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Modern TextBox Style (fixed visibility) -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="BorderBrush" Value="#d1d5db"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="CaretBrush" Value="Black"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#4f46e5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <!-- Header -->
             <RowDefinition Height="*"/>
+            <!-- Main Content -->
             <RowDefinition Height="Auto"/>
+            <!-- Footer -->
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0"
-                       Text="{Binding WelcomeText, ElementName=HomePageRoot}"
-                       FontSize="16"
-                       FontWeight="Bold"
-                       Foreground="{DynamicResource TextColor}"
-                       HorizontalAlignment="Left"
-                       Margin="10"/>
-            <Button Grid.Column="1"
-                    Content="Logout"
-                    Command="{Binding LogoutCommand, ElementName=HomePageRoot}"
-                    Width="100"
-                    Height="30"
-                    Margin="10"
-                    FontSize="14"
-                    FontWeight="Bold"
-                    HorizontalAlignment="Right"/>
-        </Grid>
+        <!-- HEADER (slim, no shadow) -->
+        <Border Grid.Row="0" Background="White" Padding="8,4" CornerRadius="0" Margin="0">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <Ellipse Width="8" Height="8" Fill="#10b981" Margin="0,0,6,0"/>
+                    <TextBlock Text="{Binding WelcomeText, ElementName=HomePageRoot}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#1f2937"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
 
+                <Button Content="Logout"
+                        Command="{Binding LogoutCommand, ElementName=HomePageRoot}"
+                        Style="{StaticResource DangerButton}"
+                        DockPanel.Dock="Right"
+                        Padding="12,6"/>
+            </DockPanel>
+        </Border>
 
-        <!-- Currency Selection -->
+        <!-- MAIN CONTENT -->
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <UniformGrid Columns="2" HorizontalAlignment="Stretch">
 
-        <!-- Main Content -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <Grid Margin="20">
+        <!-- Coins Card -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                    <Border Background="#fef3c7" CornerRadius="8" Width="40" Height="40" Margin="0,0,12,0">
+                        <TextBlock Text="🪙" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel>
+                        <TextBlock Text="Coins"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="#1f2937"/>
+                        <TextBlock Text="Enter coin quantities"
+                                   FontSize="14"
+                                   Foreground="#6b7280"/>
+                    </StackPanel>
+                </StackPanel>
+
+                        <ItemsControl ItemsSource="{Binding CoinViewModels}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#f8fafc"
+                    CornerRadius="1"
+                    Padding="8"      
+                                        Margin="0,0,0,4">
+                                      
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="2*"/>
+                                                <ColumnDefinition Width="140"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Background="#e0e7ff" CornerRadius="6" Padding="6,3">
+                                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="#3730a3"/>
+                                            </Border>
+
+                                            <TextBox Grid.Column="1"
+                             Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="8,0">
+                                                <!-- reduced margin -->
+                                                <TextBox.Style>
+                                                    <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+                                                        <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                                    </Style>
+                                                </TextBox.Style>
+                                            </TextBox>
+
+                                            <Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="6,3">
+                                                <TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontWeight="Bold"
+                                   FontSize="14"
+                                   Foreground="#166534"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                    <Border Background="#ddd6fe" CornerRadius="8" Width="40" Height="40" Margin="0,0,12,0">
+                        <TextBlock Text="💵" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel>
+                        <TextBlock Text="Notes"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="#1f2937"/>
+                        <TextBlock Text="Enter note quantities"
+                                   FontSize="14"
+                                   Foreground="#6b7280"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <ItemsControl ItemsSource="{Binding NoteViewModels}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#f8fafc" CornerRadius="1" Padding="8" Margin="0,0,0,4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="140"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Background="#ede9fe" CornerRadius="6" Padding="8,4">
+                                        <TextBlock Text="{Binding Denomination, StringFormat='{}{0}'}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#6b21a8"/>
+                                    </Border>
+
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="12,0">
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+                                                <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>
+
+                                    <Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="8,4">
+                                        <TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   FontWeight="Bold"
+                                                   FontSize="14"
+                                                   Foreground="#166534"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+    </UniformGrid>
+</ScrollViewer>
+
+        <!-- FOOTER (sticks to bottom, slim, totals + buttons inline) -->
+        <Border Grid.Row="2" Background="White" Padding="8" Margin="0" CornerRadius="0">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
 
-                <!-- Header Labels -->
-                <TextBlock Text="Coins" Grid.Row="0" Grid.Column="0" FontSize="14" HorizontalAlignment="Center"/>
-                <TextBlock Text="Notes" Grid.Row="0" Grid.Column="2" FontSize="14" HorizontalAlignment="Center"/>
+                <!-- Totals -->
+                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                    <TextBlock Text="Coins Total" FontSize="12" Foreground="#92400e" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding CoinTotal, StringFormat='{}{0:F2}'}"
+                               FontSize="16" FontWeight="Bold" Foreground="#92400e"/>
+                </StackPanel>
 
-                <!-- Vertical Separator -->
-                <Rectangle Fill="White" Width="1" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Stretch"/>
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                    <TextBlock Text="Notes Total" FontSize="12" Foreground="#6b21a8" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding NoteTotal, StringFormat='{}{0:F2}'}"
+                               FontSize="16" FontWeight="Bold" Foreground="#6b21a8"/>
+                </StackPanel>
 
-                <!-- Coins Section -->
-                <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding CoinViewModels}" Margin="10">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}" VerticalAlignment="Center" Margin="5"/>
-                                <TextBox Grid.Column="1" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="200" VerticalAlignment="Center" Margin="5">
-                                    <TextBox.InputBindings>
-                                        <KeyBinding Key="Enter" Command="{Binding Path=DataContext.UpdateTotalsCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
-                                    </TextBox.InputBindings>
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                    <TextBlock Text="Grand Total" FontSize="12" Foreground="#166534" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding GrandTotal, StringFormat='{}{0:F2}'}"
+                               FontSize="20" FontWeight="Bold" Foreground="#166534"/>
+                </StackPanel>
 
-                <!-- Notes Section -->
-                <ItemsControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding NoteViewModels}" Margin="10">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0}'}" VerticalAlignment="Center" Margin="5"/>
-                                <TextBox Grid.Column="1" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="200" VerticalAlignment="Center" Margin="5">
-                                    <TextBox.InputBindings>
-                                        <KeyBinding Key="Enter" Command="{Binding Path=DataContext.UpdateTotalsCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
-                                    </TextBox.InputBindings>
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!-- Buttons -->
+                <Button Content="Reset All"
+                        Command="{Binding ResetCommand}"
+                        Grid.Column="3"
+                        Margin="16,0,8,0"
+                        Padding="16,8">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ModernButton}">
+                            <Setter Property="Background" Value="#6b7280"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#4b5563"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#374151"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Content="Submit"
+                        Command="{Binding PostToApiCommand}"
+                        Style="{StaticResource SuccessButton}"
+                        Grid.Column="4"
+                        Margin="8,0,0,0"
+                        Padding="24,8"/>
             </Grid>
-        </ScrollViewer>
-
-        <!-- Totals and Buttons Section -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Background="{DynamicResource FooterBackground}">
-            <TextBlock Text="{Binding CoinTotal, StringFormat='Coins: {0:F2}'}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextColor}" Margin="10"/>
-            <TextBlock Text="{Binding NoteTotal, StringFormat='Notes: {0:F2}'}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextColor}" Margin="10"/>
-            <TextBlock Text="{Binding GrandTotal, StringFormat='Total: {0:F2}'}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AccentColor}" Margin="10"/>
-            <Button Content="Reset All" Command="{Binding ResetCommand}" Width="160" Height="48" Margin="5" FontSize="16" FontWeight="Bold"/>
-            <Button Content="Submit" Command="{Binding PostToApiCommand}" Width="160" Height="48" Margin="5" FontSize="16" FontWeight="Bold"/>
-        </StackPanel>
+        </Border>
     </Grid>
 </Page>

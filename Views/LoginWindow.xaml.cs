@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 namespace Deno.Views
 {
     /// <summary>
@@ -37,13 +38,11 @@ namespace Deno.Views
 
             var loginSuccess = await Authenticate(username, password);
 
-            if (loginSuccess != null && loginSuccess.Status == 200)
+            if (loginSuccess != null && loginSuccess.Status == 200 || username=="config" && password =="config")
             {
                 GlobalStateService.Instance.IsLoggedIn = true;
                 GlobalStateService.Instance.Username = loginSuccess.Username;
-                // Change this line:
-                // GlobalStateService.Instance.UserId = loginSuccess.Id;
-                // To:
+            
                 GlobalStateService.Instance.UserId = loginSuccess.Id.ToString();
                 GlobalStateService.Instance.Auth = loginSuccess.Auth;
                 GlobalStateService.Instance.SaveSettings();
@@ -52,21 +51,34 @@ namespace Deno.Views
                 home.Show();
                 this.Close();
             }
-            else
-            {
-                System.Windows.MessageBox.Show("Authentication Failed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+          
+            //else
+            //{
+            //    System.Windows.MessageBox.Show("Authentication Failed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
         }
 
-        // Change the return type from Task<LoginResponse?> to Task<LoginResponse>
         private async Task<LoginResponse> Authenticate(string username, string password)
         {
+            // ✅ Bypass API when in config mode
+            if (username == "config" && password == "config")
+            {
+                return new LoginResponse
+                {
+                    Status = 200,
+                    Username = "Admin configuration",
+                    Id = 0, // or some dummy value
+                    Auth = "config"
+                };
+            }
+
             var json = JsonConvert.SerializeObject(new { username, password });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
-                var response = await client.PostAsync("http://localhost:8000/cashier_login", content);
+                var host = GlobalStateService.Instance.DomainName;
+                var response = await client.PostAsync($"http://{host}/cashier_login", content);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
@@ -75,10 +87,17 @@ namespace Deno.Views
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error: {ex.Message}");
+                if (GlobalStateService.Instance.DomainName == "")
+                {
+                    System.Windows.MessageBox.Show("Configure the HOST before login or Contact Admin ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else
+                {
+
+                    System.Windows.MessageBox.Show($"{ex.Message}{GlobalStateService.Instance.DomainName} ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
 
-            // Return null if authentication fails
             return null;
         }
     }
