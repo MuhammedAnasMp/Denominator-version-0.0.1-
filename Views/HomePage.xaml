@@ -15,7 +15,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
+       <TextBlock Grid.Row="0"
            Text="{Binding WelcomeText, ElementName=HomePageRoot}"
            FontSize="16"
            FontWeight="Bold"
@@ -60,7 +60,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F2}'}" VerticalAlignment="Center" Margin="5"/>
+                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}" VerticalAlignment="Center" Margin="5"/>
                                 <TextBox Grid.Column="1" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="200" VerticalAlignment="Center" Margin="5">
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding Path=DataContext.UpdateTotalsCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
@@ -71,7 +71,7 @@
                                         </Style>
                                     </TextBox.Style>
                                 </TextBox>
-                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0:F2}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -92,7 +92,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F2}'}" VerticalAlignment="Center" Margin="5"/>
+                                <TextBlock Text="{Binding Denomination, StringFormat='{}{0}'}" VerticalAlignment="Center" Margin="5"/>
                                 <TextBox Grid.Column="1" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="200" VerticalAlignment="Center" Margin="5">
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding Path=DataContext.UpdateTotalsCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
@@ -103,7 +103,7 @@
                                         </Style>
                                     </TextBox.Style>
                                 </TextBox>
-                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0:F2}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Total, StringFormat='{}{0}'}" FontSize="12" Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

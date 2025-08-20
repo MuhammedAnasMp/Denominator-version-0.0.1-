@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Deno.Services
@@ -172,9 +178,146 @@ namespace Deno.Services
             OnPropertyChanged(nameof(GrandTotal));
         }
 
-        private void PostToApi(object parameter)
+        private async void PostToApi(object parameter)
         {
-            // Placeholder for API call
+            try
+            {
+                // Show authentication dialog
+                var authDialog = new AuthDialog();
+                if (authDialog.ShowDialog() != true)
+                {
+                    MessageBox.Show("Authentication cancelled.");
+                    return;
+                }
+
+                // Get password from the PasswordBox (you'll need to modify AuthDialog to expose this)
+                string password = authDialog.Password; // You'll need to implement this properly
+
+                // First, validate the manager credentials
+                bool isValid = await ValidateManagerCredentials(authDialog.Username, password);
+
+                if (!isValid)
+                {
+                    MessageBox.Show("Authentication failed. Invalid manager credentials.");
+                    return;
+                }
+
+                // If authentication successful, post the data
+                await PostDenominationData(authDialog.Username);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error posting data: {ex.Message}");
+                Console.WriteLine($"Error in PostToApi: {ex}");
+            }
+        }
+
+        private async Task<bool> ValidateManagerCredentials(string username, string password)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var authData = new
+                    {
+                        username = username,
+                        password = password
+                    };
+
+                    var json = JsonSerializer.Serialize(authData);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync("http://localhost:8000/void_id_validation", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        var result = JsonSerializer.Deserialize<AuthResponse>(responseContent);
+
+                        // Return true only if status is 200 AND counted_by is present
+                        return result?.Status == 200 && !string.IsNullOrEmpty(result.CountedBy);
+                    }
+
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error validating credentials: {ex}");
+                return false;
+            }
+        }
+
+        private async Task PostDenominationData(string countedBy)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var postData = new
+                    {
+                        CurrencyCode = SelectedCurrency?.CurrencyCode,
+                        Coins = CoinViewModels?.Select(c => new
+                        {
+                            Denomination = c.Denomination.ToString(),
+                            Quantity = c.Quantity,
+                            Total = c.Total
+                        }).ToList(),
+                        Notes = NoteViewModels?.Select(n => new
+                        {
+                            Denomination = n.Denomination.ToString(),
+                            Quantity = n.Quantity,
+                            Total = n.Total
+                        }).ToList(),
+                        CoinTotal = CoinTotal,
+                        NoteTotal = NoteTotal,
+                        GrandTotal = GrandTotal,
+                        CountedBy = countedBy,
+                        Timestamp = DateTime.UtcNow
+                    };
+
+                    var json = JsonSerializer.Serialize(postData, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
+
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    // Replace with your actual API endpoint
+                    var response = await client.PostAsync("http://localhost:8000/api/denominations", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Data posted successfully!");
+                        Console.WriteLine("Data posted to API successfully.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to post data. Status code: {response.StatusCode}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error posting data: {ex.Message}");
+                Console.WriteLine($"Error in PostDenominationData: {ex}");
+            }
+        }
+
+        // Helper class for authentication response
+        public class AuthResponse
+        {
+            [JsonPropertyName("message")]
+            public string Message { get; set; }
+
+            [JsonPropertyName("success")]
+            public bool Success { get; set; }
+
+            [JsonPropertyName("status")]
+            public int Status { get; set; }
+
+            [JsonPropertyName("counted_by")]
+            public string CountedBy { get; set; }
         }
     }
 

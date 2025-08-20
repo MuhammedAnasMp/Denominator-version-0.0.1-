@@ -121,6 +121,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Behaviors\NumericValidationBehavior.cs" />
+    <Compile Include="Services\AuthDialog.xaml.cs">
+      <DependentUpon>AuthDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services\CurrencyService.cs" />
     <Compile Include="Services\GlobalStateService.cs" />
     <Compile Include="ViewModels\CoinViewModel.cs" />
@@ -152,6 +155,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Services\AuthDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ConfigPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

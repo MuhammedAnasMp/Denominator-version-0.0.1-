@@ -51,12 +51,23 @@ namespace Deno.Behaviors
         {
             if (sender is TextBox textBox)
             {
-                if (!string.IsNullOrEmpty(textBox.Text) && !IsTextNumeric(textBox.Text))
+                // If user clears text, reset to 0
+                if (string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    textBox.Text = "0";
+                    textBox.CaretIndex = textBox.Text.Length; // keep cursor at end
+                    return;
+                }
+
+                // If not numeric, clean it
+                if (!IsTextNumeric(textBox.Text))
                 {
                     textBox.Text = Regex.Replace(textBox.Text, "[^0-9]", "");
+                    textBox.CaretIndex = textBox.Text.Length; // keep cursor at end
                 }
             }
         }
+
 
         private static bool IsTextNumeric(string text) =>
             Regex.IsMatch(text, @"^[0-9]+$");
