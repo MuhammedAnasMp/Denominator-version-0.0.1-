@@ -4,7 +4,7 @@
         Title="Manager Authentication" 
         Height="180" 
         Width="280"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight">
     <Grid Margin="8">

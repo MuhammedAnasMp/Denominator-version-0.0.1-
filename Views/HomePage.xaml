@@ -7,6 +7,7 @@
       xmlns:local="clr-namespace:Deno.Behaviors"
       xmlns:services="clr-namespace:Deno.Services"
       mc:Ignorable="d">
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -15,16 +16,32 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-       <TextBlock Grid.Row="0"
-           Text="{Binding WelcomeText, ElementName=HomePageRoot}"
-           FontSize="16"
-           FontWeight="Bold"
-           Foreground="{DynamicResource TextColor}"
-           HorizontalAlignment="Left"
-           Margin="10"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"
+                       Text="{Binding WelcomeText, ElementName=HomePageRoot}"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource TextColor}"
+                       HorizontalAlignment="Left"
+                       Margin="10"/>
+            <Button Grid.Column="1"
+                    Content="Logout"
+                    Command="{Binding LogoutCommand, ElementName=HomePageRoot}"
+                    Width="100"
+                    Height="30"
+                    Margin="10"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Right"/>
+        </Grid>
+
 
         <!-- Currency Selection -->
-     
+
         <!-- Main Content -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
             <Grid Margin="20">

@@ -126,6 +126,7 @@
     </Compile>
     <Compile Include="Services\CurrencyService.cs" />
     <Compile Include="Services\GlobalStateService.cs" />
+    <Compile Include="ViewModels\HomePageViewModel.cs" />
     <Compile Include="ViewModels\CoinViewModel.cs" />
     <Compile Include="ViewModels\NoteViewModel.cs" />
     <Compile Include="Views\ConfigPage.xaml.cs">

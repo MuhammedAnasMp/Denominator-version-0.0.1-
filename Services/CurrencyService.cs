@@ -194,16 +194,17 @@ namespace Deno.Services
                 string password = authDialog.Password; // You'll need to implement this properly
 
                 // First, validate the manager credentials
-                bool isValid = await ValidateManagerCredentials(authDialog.Username, password);
+                string isValid = await ValidateManagerCredentials(authDialog.Username, password);
 
-                if (!isValid)
+                // FIX: Use != instead of !== for C#
+                if (isValid == "false")
                 {
                     MessageBox.Show("Authentication failed. Invalid manager credentials.");
                     return;
                 }
 
                 // If authentication successful, post the data
-                await PostDenominationData(authDialog.Username);
+                await PostDenominationData(isValid);
             }
             catch (Exception ex)
             {
@@ -212,7 +213,7 @@ namespace Deno.Services
             }
         }
 
-        private async Task<bool> ValidateManagerCredentials(string username, string password)
+        private async Task<string> ValidateManagerCredentials(string username, string password)
         {
             try
             {
@@ -235,16 +236,20 @@ namespace Deno.Services
                         var result = JsonSerializer.Deserialize<AuthResponse>(responseContent);
 
                         // Return true only if status is 200 AND counted_by is present
-                        return result?.Status == 200 && !string.IsNullOrEmpty(result.CountedBy);
+                        if (result?.Status == 200 && !string.IsNullOrEmpty(result.CountedBy))
+                        {
+                          
+                            return result.CountedBy;
+                        }
                     }
 
-                    return false;
+                    return "false";
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error validating credentials: {ex}");
-                return false;
+                return "false";
             }
         }
 
@@ -273,7 +278,13 @@ namespace Deno.Services
                         NoteTotal = NoteTotal,
                         GrandTotal = GrandTotal,
                         CountedBy = countedBy,
-                        Timestamp = DateTime.UtcNow
+                        Timestamp = DateTime.UtcNow,
+                        PosNumber = GlobalStateService.Instance.PosNumber,
+                        LocCode = GlobalStateService.Instance.LocCode,
+                        UserId = GlobalStateService.Instance.UserId,
+                        UserName = GlobalStateService.Instance.Username
+
+
                     };
 
                     var json = JsonSerializer.Serialize(postData, new JsonSerializerOptions
@@ -289,7 +300,7 @@ namespace Deno.Services
                     if (response.IsSuccessStatusCode)
                     {
                         MessageBox.Show("Data posted successfully!");
-                        Console.WriteLine("Data posted to API successfully.");
+                        Reset( null);
                     }
                     else
                     {

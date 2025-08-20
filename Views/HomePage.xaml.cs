@@ -3,6 +3,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace Deno.Views
 {
@@ -10,12 +11,14 @@ namespace Deno.Views
     {
         public string WelcomeText { get; set; }
         private readonly CurrencyService _currencyService;
+        private readonly GlobalStateService _globalStateService;
 
         public HomePage(string username, CurrencyService currencyService)
         {
             InitializeComponent();
-            WelcomeText = $"Welcome, {username}!";
+            _globalStateService = GlobalStateService.Instance;
             _currencyService = currencyService;
+            WelcomeText = $"Welcome, {username}!";
             DataContext = _currencyService;
             this.SetValue(WelcomeTextProperty, WelcomeText);
         }
@@ -25,10 +28,30 @@ namespace Deno.Views
 
         public ICommand UpdateTotalsCommand => new RelayCommand(UpdateTotals);
 
+        public ICommand LogoutCommand => new RelayCommand(ExecuteLogout);
+
         private void UpdateTotals(object parameter)
         {
             _currencyService.OnPropertyChanged(nameof(CurrencyService.CoinViewModels));
             _currencyService.OnPropertyChanged(nameof(CurrencyService.NoteViewModels));
+        }
+
+        private void ExecuteLogout(object parameter)
+        {
+            // Reset GlobalStateService properties
+            _globalStateService.Auth = "";
+            _globalStateService.Username = "";
+            _globalStateService.UserId = "";
+            _globalStateService.IsLoggedIn = false;
+
+            // Save the updated settings
+            _globalStateService.SaveSettings();
+
+            // Show the LoginWindow
+            LoginWindow login = new LoginWindow();
+            Window.GetWindow(this)?.Close();
+            MessageBox.Show("You have been logged out.", "Logout", MessageBoxButton.OK, MessageBoxImage.Information);
+            login.Show();
         }
     }
 
