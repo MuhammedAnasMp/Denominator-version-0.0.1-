@@ -12,10 +12,11 @@ namespace Deno.Views
             InitializeComponent();
 
             // Populate currency picker
-            CurrencyPicker.ItemsSource = new[] { "AED", "KWD", "USD" };
+            //CurrencyPicker.ItemsSource = new[] { "AED", "KWD", "USD" };
+            CurrencyPicker.ItemsSource = new[] { "KWD" }; 
 
             // Set selected item based on loaded CurrencyCode
-            CurrencyPicker.SelectedItem = GlobalStateService.Instance.CurrencyCode ?? "AED";
+            CurrencyPicker.SelectedItem = GlobalStateService.Instance.CurrencyCode ?? "KWD";
 
       
         }
@@ -42,7 +43,7 @@ namespace Deno.Views
                 // Save settings to JSON file
                 GlobalStateService.Instance.SaveSettings();
 
-                if (GlobalStateService.Instance.Auth == "config")
+                if (GlobalStateService.Instance.Auth == "configuration")
                 {
                     GlobalStateService.Instance.IsLoggedIn = false;
                     GlobalStateService.Instance.Username = "";
@@ -58,6 +59,14 @@ namespace Deno.Views
                 else
                 {
                     MessageBox.Show("Configuration saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                    GlobalStateService.Instance.IsLoggedIn = false;
+                    GlobalStateService.Instance.Username = "";
+                    GlobalStateService.Instance.UserId = "";
+                    GlobalStateService.Instance.Auth = "";
+                    GlobalStateService.Instance.SaveSettings();
+                    LoginWindow login = new LoginWindow();
+                    login.Show();
+                    Window.GetWindow(this)?.Close();
                 }
             }
             catch (Exception ex)

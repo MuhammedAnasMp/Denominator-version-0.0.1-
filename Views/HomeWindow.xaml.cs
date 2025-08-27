@@ -29,7 +29,8 @@ namespace Deno.Views
             _auth = auth;
             var currencyService = new CurrencyService();
 
-            if (auth == "config")
+            
+            if (auth == "configuration")
             {
                 HomeFrame.Content = new ConfigPage();
             }
@@ -53,7 +54,7 @@ namespace Deno.Views
                     ConfigTab.Visibility = Visibility.Collapsed;
                     break;
 
-                case "void":
+                case "supervisor":
                     HomeTab.Visibility = Visibility.Visible;
                     ManageTab.Visibility = Visibility.Visible;
                     ConfigTab.Visibility = Visibility.Collapsed;
@@ -65,7 +66,7 @@ namespace Deno.Views
                     ConfigTab.Visibility = Visibility.Visible;
                     break;
 
-                case "config":
+                case "configuration":
                     HomeTab.Visibility = Visibility.Visible;
                     ManageTab.Visibility = Visibility.Collapsed;
                     ConfigTab.Visibility = Visibility.Collapsed;

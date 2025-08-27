@@ -18,6 +18,13 @@ namespace Deno.Services
         private string _username = "";
         private string _userId = "";
         private string _auth = "";
+        private string _locName = "";
+
+        public string LocName
+        {
+            get => _locName;
+            set { _locName = value ?? ""; OnPropertyChanged(nameof(LocName)); }
+        }
 
         public string LocCode
         {
@@ -85,6 +92,7 @@ namespace Deno.Services
             {
                 var settings = new AppSettings
                 {
+                    LocName = LocName,
                     LocCode = LocCode,
                     PosNumber = PosNumber,
                     DomainName = DomainName,
@@ -117,7 +125,7 @@ namespace Deno.Services
                     string json = File.ReadAllText(SettingsFilePath);
                     Console.WriteLine($"Raw JSON: {json}");
                     var settings = JsonSerializer.Deserialize<AppSettings>(json);
-
+                    LocName = settings.LocName ?? "";
                     LocCode = settings.LocCode ?? "";
                     PosNumber = settings.PosNumber ?? "";
                     DomainName = settings.DomainName ?? "";
@@ -133,6 +141,7 @@ namespace Deno.Services
                 {
                     Console.WriteLine("No settings file found, using defaults.");
                     LocCode = "";
+                    LocName = "";
                     PosNumber = "";
                     DomainName = "";
                     CurrencyCode = "AED";
@@ -140,12 +149,14 @@ namespace Deno.Services
                     Username = "";
                     UserId = "";
                     Auth = "";
+
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to load settings: {ex.Message}\nStackTrace: {ex.StackTrace}");
                 LocCode = "";
+                LocName = "";
                 PosNumber = "";
                 DomainName = "";
                 CurrencyCode = "AED";
@@ -160,6 +171,7 @@ namespace Deno.Services
 
     public class AppSettings
     {
+        public string LocName { get; set; }
         public string LocCode { get; set; }
         public string PosNumber { get; set; }
         public string DomainName { get; set; }

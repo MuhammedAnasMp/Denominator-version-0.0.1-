@@ -4,9 +4,11 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,6 +18,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Input;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 namespace Deno.Views
 {
@@ -30,6 +33,28 @@ namespace Deno.Views
         {
             InitializeComponent();
         }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            UsernameBox.Focus(); 
+        }
+
+        private void UsernameBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                PasswordBox.Focus();
+                e.Handled = true; 
+            }
+        }
+
+        private void PasswordBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                Login_Click(sender, new RoutedEventArgs()); 
+                e.Handled = true; 
+            }
+        }
 
         private async void Login_Click(object sender, RoutedEventArgs e)
         {
@@ -38,11 +63,13 @@ namespace Deno.Views
 
             var loginSuccess = await Authenticate(username, password);
 
-            if (loginSuccess != null && loginSuccess.Status == 200 || username=="config" && password =="config")
+            
+
+            if (loginSuccess != null && loginSuccess.Status == 200 || username=="con" && password =="con")
             {
                 GlobalStateService.Instance.IsLoggedIn = true;
+                
                 GlobalStateService.Instance.Username = loginSuccess.Username;
-            
                 GlobalStateService.Instance.UserId = loginSuccess.Id.ToString();
                 GlobalStateService.Instance.Auth = loginSuccess.Auth;
                 GlobalStateService.Instance.SaveSettings();
@@ -51,54 +78,111 @@ namespace Deno.Views
                 home.Show();
                 this.Close();
             }
-          
-            //else
-            //{
-            //    System.Windows.MessageBox.Show("Authentication Failed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
+
+            else
+            {
+                UsernameBox.Focus();
+
+
+            }
         }
 
-        private async Task<LoginResponse> Authenticate(string username, string password)
+        private async Task<CashierLoginResponse> Authenticate(string cashier_id, string password)
         {
-            // ✅ Bypass API when in config mode
-            if (username == "config" && password == "config")
+            if (cashier_id == "con" && password == "con")
             {
-                return new LoginResponse
+                return new CashierLoginResponse
                 {
                     Status = 200,
-                    Username = "Admin configuration",
-                    Id = 0, // or some dummy value
-                    Auth = "config"
+                    Id = 1234,
+                    Username = "configuration",
+                    Auth = "configuration"
                 };
             }
 
-            var json = JsonConvert.SerializeObject(new { username, password });
+            var json = JsonConvert.SerializeObject(new { cashier_id, password });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
                 var host = GlobalStateService.Instance.DomainName;
-                var response = await client.PostAsync($"http://{host}/cashier_login", content);
-                if (response.IsSuccessStatusCode)
+
+                if (string.IsNullOrWhiteSpace(host))
                 {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<LoginResponse>(responseString);
+                    ShowError("Configure the HOST before login or Contact Admin");
+                    return new CashierLoginResponse { Status = 500, Message = "HOST not configured" };
                 }
+
+                var response = await client.PostAsync($"http://{host}/cashier_login", content);
+                HttpStatusCode statusCode = response.StatusCode;
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMsg;
+
+                    switch (statusCode)
+                    {
+                        case HttpStatusCode.BadRequest: // 400
+                            errorMsg = "Username and password must be numbers ";
+                            break;
+                        case HttpStatusCode.Unauthorized: // 401
+                            errorMsg = "Invalid credentials";
+                            break;
+                        default:
+                            errorMsg = $"Server returned status code: {(int)statusCode} ({response.ReasonPhrase})";
+                            break;
+                    }
+
+                    ShowError(errorMsg);
+
+                    return new CashierLoginResponse
+                    {
+                        Status = (int)statusCode,
+                        Message = errorMsg
+                    };
+                }
+
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrWhiteSpace(responseString))
+                {
+                    ShowError("Empty response received from server.");
+                    return new CashierLoginResponse { Status = 500, Message = "Empty server response" };
+                }
+
+                try
+                {
+                    var loginResponse = JsonConvert.DeserializeObject<CashierLoginResponse>(responseString);
+
+                    if (loginResponse == null)
+                    {
+                        ShowError("Invalid response format from server.");
+                        return new CashierLoginResponse { Status = 500, Message = "Invalid server response" };
+                    }
+
+                    return loginResponse;
+                }
+                catch (JsonException)
+                {
+                    ShowError("Failed to parse server response.");
+                    return new CashierLoginResponse { Status = 500, Message = "Response parsing error" };
+                }
+            }
+            catch (HttpRequestException httpEx)
+            {
+                ShowError($"Connection failed: {httpEx.Message}");
+                return new CashierLoginResponse { Status = 500, Message = "Connection error" };
             }
             catch (Exception ex)
             {
-                if (GlobalStateService.Instance.DomainName == "")
-                {
-                    System.Windows.MessageBox.Show("Configure the HOST before login or Contact Admin ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else
-                {
-
-                    System.Windows.MessageBox.Show($"{ex.Message}{GlobalStateService.Instance.DomainName} ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                ShowError($"Unexpected error: {ex.Message}");
+                return new CashierLoginResponse { Status = 500, Message = "Unexpected error" };
             }
-
-            return null;
         }
+        private void ShowError(string message)
+{
+             System.Windows.MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+}
+
+
     }
 }

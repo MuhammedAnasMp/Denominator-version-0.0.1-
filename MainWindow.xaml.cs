@@ -16,9 +16,7 @@ using System.Windows.Shapes;
 
 namespace Deno
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -27,18 +25,18 @@ namespace Deno
 
             if (Properties.Settings.Default.IsLoggedIn)
             {
-                // Already logged in → show Home window
+                //  Home window
                 var home = new HomeWindow(Properties.Settings.Default.Username , Properties.Settings.Default.Auth);
                 home.Show();
             }
             else
             {
-                // Not logged in → show Login window
+                // show Login window
                 var login = new LoginWindow();
                 login.Show();
             }
 
-            // Close MainWindow since it just acts as a launcher
+            // Close MainWindow 
             this.Close();
         }
 

@@ -36,18 +36,31 @@ namespace Deno.Views
             _currencyService.OnPropertyChanged(nameof(CurrencyService.NoteViewModels));
         }
 
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox != null)
+            {
+                textBox.SelectAll();
+
+            }
+        }
+
+
+
         private void ExecuteLogout(object parameter)
         {
-            // Reset GlobalStateService properties
+          
             _globalStateService.Auth = "";
             _globalStateService.Username = "";
             _globalStateService.UserId = "";
             _globalStateService.IsLoggedIn = false;
 
-            // Save the updated settings
+          
             _globalStateService.SaveSettings();
 
-            // Show the LoginWindow
+          
             LoginWindow login = new LoginWindow();
             Window.GetWindow(this)?.Close();
             MessageBox.Show("You have been logged out.", "Logout", MessageBoxButton.OK, MessageBoxImage.Information);
