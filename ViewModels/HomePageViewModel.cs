@@ -19,21 +19,19 @@ namespace Deno.ViewModels
 
         private void ExecuteLogout(object parameter)
         {
-            // Reset authentication-related properties
+          
             _globalStateService.Auth = "";
             _globalStateService.Username = "";
             _globalStateService.UserId = "";
             _globalStateService.IsLoggedIn = false;
 
-            // Save the updated settings
+         
             _globalStateService.SaveSettings();
 
-            // Optionally, navigate to a login page or perform other logout actions
-            // For example, navigate to a LoginPage
-            // NavigationService?.Navigate(new Uri("/Views/LoginPage.xaml", UriKind.Relative));
+  
         }
 
-        // INotifyPropertyChanged implementation
+  
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -41,7 +39,6 @@ namespace Deno.ViewModels
         }
     }
 
-    // RelayCommand implementation for ICommand
     public class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;

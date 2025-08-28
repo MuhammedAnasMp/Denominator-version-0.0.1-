@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,7 +19,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Input;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 namespace Deno.Views
 {
@@ -35,7 +35,11 @@ namespace Deno.Views
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            UsernameBox.Focus(); 
+            UsernameBox.Focus();
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            string versionString = version.ToString(); 
+
+            VersionTextBlock.Text = "Version: " + versionString;
         }
 
         private void UsernameBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -46,6 +50,7 @@ namespace Deno.Views
                 e.Handled = true; 
             }
         }
+   
 
         private void PasswordBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {

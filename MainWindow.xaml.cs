@@ -22,7 +22,6 @@ namespace Deno
         public MainWindow()
         {
             InitializeComponent();
-
             if (Properties.Settings.Default.IsLoggedIn)
             {
                 //  Home window

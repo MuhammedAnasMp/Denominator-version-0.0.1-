@@ -12,6 +12,7 @@ namespace Deno.Services
 
         private string _locCode = "";
         private string _posNumber = "";
+        private string _printerName = "";
         private string _domainName = "";
         private string _currencyCode = "AED";
         private bool _isLoggedIn;
@@ -30,6 +31,11 @@ namespace Deno.Services
         {
             get => _locCode;
             set { _locCode = value ?? ""; OnPropertyChanged(nameof(LocCode)); }
+        }
+        public string PrinterName
+        {
+            get => _printerName;
+            set { _printerName = value ?? ""; OnPropertyChanged(nameof(PrinterName)); }
         }
 
         public string PosNumber
@@ -94,6 +100,7 @@ namespace Deno.Services
                 {
                     LocName = LocName,
                     LocCode = LocCode,
+                    PrinterName = PrinterName , 
                     PosNumber = PosNumber,
                     DomainName = DomainName,
                     CurrencyCode = CurrencyCode,
@@ -128,6 +135,7 @@ namespace Deno.Services
                     LocName = settings.LocName ?? "";
                     LocCode = settings.LocCode ?? "";
                     PosNumber = settings.PosNumber ?? "";
+                    PrinterName = settings.PrinterName ?? "";
                     DomainName = settings.DomainName ?? "";
                     CurrencyCode = settings.CurrencyCode ?? "AED";
                     IsLoggedIn = settings.IsLoggedIn;
@@ -142,6 +150,7 @@ namespace Deno.Services
                     Console.WriteLine("No settings file found, using defaults.");
                     LocCode = "";
                     LocName = "";
+                    PrinterName = "";
                     PosNumber = "";
                     DomainName = "";
                     CurrencyCode = "AED";
@@ -180,5 +189,6 @@ namespace Deno.Services
         public string Username { get; set; }
         public string UserId { get; set; }
         public string Auth { get; set; }
+        public string PrinterName { get; set; }
     }
 }

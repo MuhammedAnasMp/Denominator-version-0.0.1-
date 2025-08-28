@@ -23,8 +23,7 @@ namespace Deno.Views
             this.SetValue(WelcomeTextProperty, WelcomeText);
         }
 
-        public static readonly DependencyProperty WelcomeTextProperty =
-            DependencyProperty.Register("WelcomeText", typeof(string), typeof(HomePage), new PropertyMetadata(string.Empty));
+        public static readonly DependencyProperty WelcomeTextProperty = DependencyProperty.Register("WelcomeText", typeof(string), typeof(HomePage), new PropertyMetadata(string.Empty));
 
         public ICommand UpdateTotalsCommand => new RelayCommand(UpdateTotals);
 

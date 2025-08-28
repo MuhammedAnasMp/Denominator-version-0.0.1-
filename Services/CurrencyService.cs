@@ -221,7 +221,7 @@ namespace Deno.Services
                                     return truncated.ToString("0.000", CultureInfo.InvariantCulture);
                                 }
                                 string StoreName = GlobalStateService.Instance.LocName;
-                               
+                                string PrinterName = GlobalStateService.Instance.PrinterName;
                                 string htmlContent = $@"
                                     <!DOCTYPE html>
                                     <html lang='en'>
@@ -236,6 +236,7 @@ namespace Deno.Services
                                                 padding: 10px;
 
                                             }}
+
                                             .receipt-container {{
                                                 margin: 0 auto;
                                                 background: white;
@@ -445,10 +446,41 @@ namespace Deno.Services
 
                              
                                 var printerService = new PrinterService();
-                                AsyncPrintTask.Exec(
-                                    true,
-                                    () => printerService.DoPrint(htmlContent, "POS", 46)
-                                );
+                                try
+                                {
+                                    AsyncPrintTask.Exec(
+                                        true,
+                                        () =>
+                                        {
+                                            try
+                                            {
+                                                printerService.DoPrint(htmlContent, PrinterName, 46);
+                                            }
+                                            catch (Exception ex)
+                                            {
+
+                                                MessageBox.Show(
+                                                    $"Check if the printer name is in the correct format and uses capital letters appropriately.\r\n" +
+                                                    $"Error Details: {ex.Message}",
+                                                    "Error: Printer Not Found",
+                                                    MessageBoxButton.OK,
+                                                    MessageBoxImage.Error
+                                                );
+
+                                            }
+                                        }
+                                    );
+                                }
+                                catch (PrinterNotFoundException ex)
+                                {
+                                    MessageBox.Show(
+                                                        $"Check if the printer name is in the correct format and uses capital letters appropriately.\r\n" +
+                                                        $"",
+                                                        ex.Message,
+                                                        MessageBoxButton.OK,
+                                                        MessageBoxImage.Error
+                                                    );
+                                }
 
                                 Reset(null);
                                
@@ -471,7 +503,7 @@ namespace Deno.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error fetching data: {ex.Message}");
+                MessageBox.Show($"Error: {ex.Message}");
             }
         }
 
@@ -514,6 +546,7 @@ namespace Deno.Services
                 int? createdId = await PostDenominationData();
                 if (createdId.HasValue)
                 {
+
                     PrintReceipt((int)createdId);
                 }
 
@@ -677,8 +710,6 @@ namespace Deno.Services
 
             [JsonPropertyName("transaction_report")]
             public   Dictionary<string, List<TransactionEntry>> Transaction { get; set; }
-
-
 
             [JsonPropertyName("counted_by")]
             public string CountedBy { get; set; }
