@@ -18,6 +18,24 @@ namespace Deno.Views
         private readonly CurrencyService _currencyService;
         private readonly GlobalStateService _globalStateService;
 
+        public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register(
+            "IsLoading", typeof(bool), typeof(HomePage), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty UpdatingRecordProperty = DependencyProperty.Register(
+            "UpdatingRecord", typeof(bool), typeof(HomePage), new PropertyMetadata(false));
+
+        public bool IsLoading
+        {
+            get => (bool)GetValue(IsLoadingProperty);
+            set => SetValue(IsLoadingProperty, value);
+        }
+
+        public bool UpdatingRecord
+        {
+            get => (bool)GetValue(UpdatingRecordProperty);
+            set => SetValue(UpdatingRecordProperty, value);
+        }
+
         public HomePage(string username, CurrencyService currencyService)
         {
             InitializeComponent();
@@ -27,8 +45,7 @@ namespace Deno.Views
             DataContext = _currencyService;
             this.SetValue(WelcomeTextProperty, WelcomeText);
 
-         
-            _ = LoadDenominationDataAsync(); 
+            _ = LoadDenominationDataAsync();
         }
 
         public static readonly DependencyProperty WelcomeTextProperty = DependencyProperty.Register(
@@ -42,6 +59,7 @@ namespace Deno.Views
         {
             try
             {
+                IsLoading = true;
                 using (var client = new HttpClient())
                 {
                     var host = _globalStateService.DomainName;
@@ -59,14 +77,18 @@ namespace Deno.Views
 
                         if (result?.Data != null && result.Data.Count > 0)
                         {
-                            var data = result.Data[0]; 
-                            Console.WriteLine($"API Data: KD_025={data.Kd025}, NoteTotal={data.NoteTotal}"); 
+                            var data = result.Data[0];
+                            Console.WriteLine($"API Data: KD_025={data.Kd025}, NoteTotal={data.NoteTotal}");
                             await UpdateQuantitiesFromApi(data);
+                            UpdatingRecord = true; // Set to true since API data was loaded and quantities updated
+                            Console.WriteLine($"UpdatingRecord set to: {UpdatingRecord}");
+                            IsLoading = false;
+                            MessageBox.Show("Manager ID is required to update existing records.", "Update Required", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                         else
                         {
                             Console.WriteLine("API returned empty data (tables: []), skipping quantity update.");
-                           
+                            UpdatingRecord = false; // No data, so not updating a record
                         }
                     }
                     else
@@ -74,6 +96,7 @@ namespace Deno.Views
                         Console.WriteLine($"API failed with status: {response.StatusCode}");
                         MessageBox.Show($"Failed to fetch denomination data. Status code: {response.StatusCode}",
                             "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        UpdatingRecord = false;
                     }
                 }
             }
@@ -82,6 +105,11 @@ namespace Deno.Views
                 Console.WriteLine($"Error fetching denomination data: {ex}");
                 MessageBox.Show($"Error fetching denomination data: {ex.Message}",
                     "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                UpdatingRecord = false;
+            }
+            finally
+            {
+                IsLoading = false; // Hide loader and enable UI
             }
         }
 
@@ -89,7 +117,6 @@ namespace Deno.Views
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-              
                 if (_currencyService.SelectedCurrency?.CurrencyCode != "KWD")
                 {
                     Console.WriteLine("Setting currency to KWD");
@@ -97,7 +124,6 @@ namespace Deno.Views
                         .FirstOrDefault(c => c.CurrencyCode == "KWD");
                 }
 
-             
                 foreach (var coin in _currencyService.CoinViewModels)
                 {
                     switch (coin.Denomination)
@@ -124,7 +150,6 @@ namespace Deno.Views
                     Console.WriteLine($"Updated Coin {coin.Denomination}: Quantity={coin.Quantity}");
                 }
 
-               
                 foreach (var note in _currencyService.NoteViewModels)
                 {
                     switch (note.Denomination)

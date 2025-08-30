@@ -133,6 +133,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Behaviors\InverseBooleanConverter.cs" />
     <Compile Include="Behaviors\NumericValidationBehavior.cs" />
     <Compile Include="Services\AuthDialog.xaml.cs">
       <DependentUpon>AuthDialog.xaml</DependentUpon>
