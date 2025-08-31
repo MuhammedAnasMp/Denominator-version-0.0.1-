@@ -14,9 +14,14 @@ namespace Deno.Views
 {
     public partial class HomePage : Page
     {
-        public string WelcomeText { get; set; }
+        public string WelcomeText
+        {
+            get => (string)GetValue(WelcomeTextProperty);
+            set => SetValue(WelcomeTextProperty, value);
+        }
         private readonly CurrencyService _currencyService;
         private readonly GlobalStateService _globalStateService;
+        private readonly string _username;
 
         public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register(
             "IsLoading", typeof(bool), typeof(HomePage), new PropertyMetadata(false));
@@ -24,10 +29,20 @@ namespace Deno.Views
         public static readonly DependencyProperty UpdatingRecordProperty = DependencyProperty.Register(
             "UpdatingRecord", typeof(bool), typeof(HomePage), new PropertyMetadata(false));
 
+        public static readonly DependencyProperty UpdatingRecordIdProperty = DependencyProperty.Register(
+            "UpdatingRecordId", typeof(int), typeof(HomePage), new PropertyMetadata(null));
+
+
         public bool IsLoading
         {
             get => (bool)GetValue(IsLoadingProperty);
             set => SetValue(IsLoadingProperty, value);
+        }
+
+        public int UpdatingRecordId
+        {
+            get => (int)GetValue(UpdatingRecordIdProperty);
+            set => SetValue(UpdatingRecordIdProperty, value);
         }
 
         public bool UpdatingRecord
@@ -41,6 +56,7 @@ namespace Deno.Views
             InitializeComponent();
             _globalStateService = GlobalStateService.Instance;
             _currencyService = currencyService;
+            _username = username;
             WelcomeText = $"Welcome, {username}!";
             DataContext = _currencyService;
             this.SetValue(WelcomeTextProperty, WelcomeText);
@@ -75,43 +91,63 @@ namespace Deno.Views
                         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                         var result = JsonSerializer.Deserialize<CurrencyService.GetResponse>(responseContent, options);
 
-                        if (result?.Data != null && result.Data.Count > 0)
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            var data = result.Data[0];
-                            Console.WriteLine($"API Data: KD_025={data.Kd025}, NoteTotal={data.NoteTotal}");
-                            await UpdateQuantitiesFromApi(data);
-                            UpdatingRecord = true; // Set to true since API data was loaded and quantities updated
-                            Console.WriteLine($"UpdatingRecord set to: {UpdatingRecord}");
-                            IsLoading = false;
-                            MessageBox.Show("Manager ID is required to update existing records.", "Update Required", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                        else
-                        {
-                            Console.WriteLine("API returned empty data (tables: []), skipping quantity update.");
-                            UpdatingRecord = false; // No data, so not updating a record
-                        }
+                            if (result?.Data != null && result.Data.Count > 0)
+                            {
+                                var data = result.Data[0];
+
+                                Console.WriteLine($"API Data: KD_025={data.Kd025}, NoteTotal={data.NoteTotal}");
+                                UpdateQuantitiesFromApi(data);
+                                UpdatingRecord = true;
+                                UpdatingRecordId = result.Id;
+                                WelcomeText = $"You can update your record.";
+                                IsLoading = false;
+                                MessageBox.Show($"Manager ID is required to update existing records. {result.Id}", "Update Required", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            else
+                            {
+                                Console.WriteLine("API returned empty data (tables: []), skipping quantity update.");
+                                UpdatingRecord = false;
+                                WelcomeText = $"Welcome, {_username}!";
+                                Console.WriteLine($"UpdatingRecord set to: {UpdatingRecord}, WelcomeText: {WelcomeText}");
+                            }
+                        });
                     }
                     else
                     {
                         Console.WriteLine($"API failed with status: {response.StatusCode}");
-                        MessageBox.Show($"Failed to fetch denomination data. Status code: {response.StatusCode}",
-                            "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        UpdatingRecord = false;
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            UpdatingRecord = false;
+                            WelcomeText = $"Welcome, {_username}!";
+                            MessageBox.Show($"Failed to fetch denomination data. Status code: {response.StatusCode}",
+                                "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching denomination data: {ex}");
-                MessageBox.Show($"Error fetching denomination data: {ex.Message}",
-                    "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                UpdatingRecord = false;
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    UpdatingRecord = false;
+                    WelcomeText = $"Welcome, {_username}!";
+                    MessageBox.Show($"Error fetching denomination data: {ex.Message}",
+                        "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
             finally
             {
-                IsLoading = false; // Hide loader and enable UI
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    IsLoading = false;
+                    Console.WriteLine($"Final state: UpdatingRecord={UpdatingRecord}");
+                });
             }
         }
+
 
         private async Task UpdateQuantitiesFromApi(CurrencyService.DenominationData data)
         {
