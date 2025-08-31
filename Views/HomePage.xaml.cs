@@ -57,10 +57,7 @@ namespace Deno.Views
 
         public ICommand LogoutCommand => new RelayCommand(ExecuteLogout);
 
-        private void SetUnlock(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Unlock button clicked!");
-        }
+            
         private async Task LoadDenominationDataAsync()
         {
             try

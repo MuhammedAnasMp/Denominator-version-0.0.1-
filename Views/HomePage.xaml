@@ -384,11 +384,11 @@
 					</Button>
 
 					<Button Command="{Binding PostToApiCommand}"
-        CommandParameter="{Binding DataContext.UpdatingRecordId, RelativeSource={RelativeSource AncestorType=Page}}"
-        Style="{StaticResource SuccessButton}"
-        Grid.Column="4"
-        Margin="8,0,0,0"
-        Padding="24,8">
+						CommandParameter="{Binding DataContext.UpdatingRecordId, RelativeSource={RelativeSource AncestorType=Page}}"
+						Style="{StaticResource SuccessButton}"
+						Grid.Column="4"
+						Margin="8,0,0,0"
+						Padding="24,8">
 
 						<Button.Content>
 							<TextBlock>

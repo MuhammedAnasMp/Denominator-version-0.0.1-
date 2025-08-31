@@ -78,6 +78,18 @@ namespace Deno.Services
 
 
 
+        private bool _editMod;
+
+        public bool EditMod
+        {
+            get => _editMod;
+            set
+            {
+                _editMod = value;
+                OnPropertyChanged(nameof(EditMod));
+            }
+        }
+
 
 
         private bool _isPosting = false;

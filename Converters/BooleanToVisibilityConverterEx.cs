@@ -8,7 +8,7 @@ namespace Deno.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (value is bool updatingRecord && updatingRecord) ? "Unlock 🔒" : "Submit";
+            return (value is bool updatingRecord && updatingRecord) ? "Update" : "Submit";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
