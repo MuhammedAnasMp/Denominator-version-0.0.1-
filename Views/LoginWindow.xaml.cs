@@ -184,9 +184,9 @@ namespace Deno.Views
             }
         }
         private void ShowError(string message)
-{
-             System.Windows.MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-}
+            {
+                         System.Windows.MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
 
     }

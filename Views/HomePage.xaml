@@ -5,6 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Deno.Behaviors"
+	  xmlns:converters="clr-namespace:Deno.Converters"
       mc:Ignorable="d">
 
 	<!-- Background Gradient -->
@@ -21,7 +22,7 @@
 
 		<!-- Inverted Boolean Converter for IsEnabled -->
 		<local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-
+		<converters:BooleanToButtonContentConverter x:Key="BooleanToButtonContentConverter"/>
 		<!-- Card Style -->
 		<Style x:Key="CardStyle" TargetType="Border">
 			<Setter Property="Background" Value="White"/>
@@ -382,12 +383,26 @@
 						</Button.Style>
 					</Button>
 
-					<Button Content="Submit"
-							Command="{Binding PostToApiCommand}"
-							Style="{StaticResource SuccessButton}"
-							Grid.Column="4"
-							Margin="8,0,0,0"
-							Padding="24,8"/>
+					<Button Command="{Binding PostToApiCommand}"
+        CommandParameter="{Binding DataContext.UpdatingRecordId, RelativeSource={RelativeSource AncestorType=Page}}"
+        Style="{StaticResource SuccessButton}"
+        Grid.Column="4"
+        Margin="8,0,0,0"
+        Padding="24,8">
+
+						<Button.Content>
+							<TextBlock>
+								<TextBlock.Text>
+									<Binding Path="UpdatingRecord" Converter="{StaticResource BooleanToButtonContentConverter}">
+										<Binding.FallbackValue>Submit</Binding.FallbackValue>
+									</Binding>
+								</TextBlock.Text>
+							</TextBlock>
+						</Button.Content>
+					</Button>
+					
+					
+
 				</Grid>
 			</Border>
 		</Grid>

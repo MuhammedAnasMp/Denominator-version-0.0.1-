@@ -26,30 +26,16 @@ namespace Deno.Views
         public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register(
             "IsLoading", typeof(bool), typeof(HomePage), new PropertyMetadata(false));
 
-        public static readonly DependencyProperty UpdatingRecordProperty = DependencyProperty.Register(
-            "UpdatingRecord", typeof(bool), typeof(HomePage), new PropertyMetadata(false));
 
-        public static readonly DependencyProperty UpdatingRecordIdProperty = DependencyProperty.Register(
-            "UpdatingRecordId", typeof(int), typeof(HomePage), new PropertyMetadata(null));
-
-
+     
         public bool IsLoading
         {
             get => (bool)GetValue(IsLoadingProperty);
             set => SetValue(IsLoadingProperty, value);
         }
 
-        public int UpdatingRecordId
-        {
-            get => (int)GetValue(UpdatingRecordIdProperty);
-            set => SetValue(UpdatingRecordIdProperty, value);
-        }
-
-        public bool UpdatingRecord
-        {
-            get => (bool)GetValue(UpdatingRecordProperty);
-            set => SetValue(UpdatingRecordProperty, value);
-        }
+       
+        
 
         public HomePage(string username, CurrencyService currencyService)
         {
@@ -71,6 +57,10 @@ namespace Deno.Views
 
         public ICommand LogoutCommand => new RelayCommand(ExecuteLogout);
 
+        private void SetUnlock(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Unlock button clicked!");
+        }
         private async Task LoadDenominationDataAsync()
         {
             try
@@ -99,8 +89,9 @@ namespace Deno.Views
 
                                 Console.WriteLine($"API Data: KD_025={data.Kd025}, NoteTotal={data.NoteTotal}");
                                 UpdateQuantitiesFromApi(data);
-                                UpdatingRecord = true;
-                                UpdatingRecordId = result.Id;
+                                _currencyService.UpdatingRecord = true;
+                                // In LoadDenominationDataAsync or UpdateQuantitiesFromApi
+                                _currencyService.UpdatingRecordId = result.Id;
                                 WelcomeText = $"You can update your record.";
                                 IsLoading = false;
                                 MessageBox.Show($"Manager ID is required to update existing records. {result.Id}", "Update Required", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -108,9 +99,9 @@ namespace Deno.Views
                             else
                             {
                                 Console.WriteLine("API returned empty data (tables: []), skipping quantity update.");
-                                UpdatingRecord = false;
+                                _currencyService.UpdatingRecord = false;
                                 WelcomeText = $"Welcome, {_username}!";
-                                Console.WriteLine($"UpdatingRecord set to: {UpdatingRecord}, WelcomeText: {WelcomeText}");
+                                Console.WriteLine($"UpdatingRecord set to: {_currencyService.UpdatingRecord }, WelcomeText: {WelcomeText}");
                             }
                         });
                     }
@@ -119,7 +110,7 @@ namespace Deno.Views
                         Console.WriteLine($"API failed with status: {response.StatusCode}");
                         await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            UpdatingRecord = false;
+                            _currencyService.UpdatingRecord = false;
                             WelcomeText = $"Welcome, {_username}!";
                             MessageBox.Show($"Failed to fetch denomination data. Status code: {response.StatusCode}",
                                 "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -129,10 +120,9 @@ namespace Deno.Views
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching denomination data: {ex}");
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    UpdatingRecord = false;
+                    _currencyService.UpdatingRecord = false;
                     WelcomeText = $"Welcome, {_username}!";
                     MessageBox.Show($"Error fetching denomination data: {ex.Message}",
                         "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -143,7 +133,7 @@ namespace Deno.Views
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     IsLoading = false;
-                    Console.WriteLine($"Final state: UpdatingRecord={UpdatingRecord}");
+                    Console.WriteLine($"Final state: UpdatingRecord={_currencyService.UpdatingRecord}");
                 });
             }
         }

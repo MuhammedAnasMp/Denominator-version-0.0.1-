@@ -1,4 +1,6 @@
-﻿using PrintHTML.Core.Helpers;
+﻿using Deno.Models;
+using Newtonsoft.Json;
+using PrintHTML.Core.Helpers;
 using PrintHTML.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -6,6 +8,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -46,6 +49,37 @@ namespace Deno.Services
                 }
             }
         }
+
+
+        private int _updatingRecordId;
+
+        public int UpdatingRecordId
+        {
+            get => _updatingRecordId;
+            set
+            {
+                _updatingRecordId = value;
+                OnPropertyChanged(nameof(UpdatingRecordId));
+            }
+        }
+
+
+        private bool _updatingRecord;
+
+        public bool UpdatingRecord
+        {
+            get => _updatingRecord;
+            set
+            {
+                _updatingRecord = value;
+                OnPropertyChanged(nameof(UpdatingRecord));
+            }
+        }
+
+
+
+
+
         private bool _isPosting = false;
         private List<CoinViewModel> _coinViewModels;
         public List<CoinViewModel> CoinViewModels
@@ -189,7 +223,7 @@ namespace Deno.Services
             OnPropertyChanged(nameof(GrandTotal));
         }
 
-        private async void PrintReceipt(int createdId)
+        private async void PrintReceipt(int createdId ,bool reset = true)
         {
             try
             {
@@ -206,7 +240,7 @@ namespace Deno.Services
                         var responseContent = await response.Content.ReadAsStringAsync();
 
                         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                        var result = JsonSerializer.Deserialize<GetResponse>(responseContent, options);
+                        var result = System.Text.Json.JsonSerializer.Deserialize<GetResponse>(responseContent, options);
                         if (response.IsSuccessStatusCode)
                         {
                             // Convert the data to a readable string
@@ -481,8 +515,12 @@ namespace Deno.Services
                                                         MessageBoxImage.Error
                                                     );
                                 }
+                                //validate this 
+                                if (reset)
+                                {
 
                                 Reset(null);
+                                }
                                
                             } 
                         else
@@ -512,6 +550,9 @@ namespace Deno.Services
 
         private async void PostToApi(object parameter)
         {
+
+
+         
             try
             {
                 if (_isPosting)
@@ -519,35 +560,68 @@ namespace Deno.Services
                 _isPosting = true;
                 CommandManager.InvalidateRequerySuggested(); // disables the button
 
-                //// Show authentication dialog
-                //var authDialog = new AuthDialog();
-                //if (authDialog.ShowDialog() != true)
-                //{
-                //    MessageBox.Show("Authentication cancelled.");
-                //    return;
-                //}
-
-                //// Get password from the PasswordBox (you'll need to modify AuthDialog to expose this)
-                //string password = authDialog.Password; // You'll need to implement this properly
-
-                //// First, validate the manager credentials
-                //string isValid = await ValidateManagerCredentials(authDialog.Id, password);
-
-                //// FIX: Use != instead of !== for C#
-                //if (isValid == "false")
-                //{
-                //    MessageBox.Show("Authentication failed. Invalid manager credentials.");
-                //    return;
-                //}
-
-                // If authentication successful, post the data
-                //await PostDenominationData(isValid);
-
-                int? createdId = await PostDenominationData();
-                if (createdId.HasValue)
+                if (parameter is int updatingRecordId && updatingRecordId != 0)
                 {
 
-                    PrintReceipt((int)createdId);
+               
+                    var authDialog = new AuthDialog();
+                    if (authDialog.ShowDialog() != true)
+                        {
+                            MessageBox.Show("Authentication cancelled.");
+                            return;
+                        }
+
+                    string password = authDialog.Password;
+
+               
+                    var loginSuccess = await ValidateManagerCredentials(authDialog.Id, password);
+
+                    if(loginSuccess == null || loginSuccess.Status != 200)
+{
+                        MessageBox.Show("Authentication failed");
+                        return;
+                    }
+
+                    if (loginSuccess.Auth == "CASHIER")
+                    {
+                        MessageBox.Show("Supervisor ID is required to update denomination");
+                        return;
+                    }
+
+                    if (loginSuccess.Auth == "INVALID")
+                    {
+                        MessageBox.Show("Invalid login credentials");
+                        return;
+                    }
+
+
+
+                    //if updatingRecordId is avaialble then sent the existing data with flag to post denomination data function 
+                    // dont reset the existing quantitys because method is updating 
+
+
+                    int? updatedId = await PostDenominationData(updatingRecordId , loginSuccess.Id);
+                    if (updatedId.HasValue)
+                    {
+
+                        PrintReceipt((int)updatedId , false);
+
+                    }
+
+
+                }
+
+                else
+                {
+
+                    int? createdId = await PostDenominationData();
+                    if (createdId.HasValue)
+                    {
+
+                        PrintReceipt((int)createdId);
+
+                    }
+
                 }
 
             }
@@ -563,7 +637,7 @@ namespace Deno.Services
             }
         }
 
-        private async Task<string> ValidateManagerCredentials(string username, string password)
+        private async Task<CashierLoginResponse> ValidateManagerCredentials(string cashier_id, string password)
         {
             try
             {
@@ -571,39 +645,82 @@ namespace Deno.Services
                 {
                     var authData = new
                     {
-                        username = username,
-                        password = password
+                        cashier_id = int.Parse(cashier_id),
+                        password = int.Parse(password)
                     };
 
-                    var json = JsonSerializer.Serialize(authData);
+                    var json = System.Text.Json.JsonSerializer.Serialize(authData);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
                     var host = GlobalStateService.Instance.DomainName;
-                    var response = await client.PostAsync($"http://{host}/void_id_validation", content);
+                    var response = await client.PostAsync($"http://{host}/cashier_login", content);
 
-                    if (response.IsSuccessStatusCode)
+                    HttpStatusCode statusCode = response.StatusCode;
+                    if (!response.IsSuccessStatusCode)
                     {
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        var result = JsonSerializer.Deserialize<GetResponse>(responseContent);
+                        string errorMsg;
 
-                        // Return true only if status is 200 AND counted_by is present
-                        if (result?.Status == 200 && !string.IsNullOrEmpty(result.CountedBy))
+                        switch (statusCode)
                         {
-                          
-                            return result.CountedBy;
+                            case HttpStatusCode.BadRequest: // 400
+                                errorMsg = "Username and password must be numbers ";
+                                break;
+                            case HttpStatusCode.Unauthorized: // 401
+                                errorMsg = "Invalid credentials";
+                                break;
+                            default:
+                                errorMsg = $"Server returned status code: {(int)statusCode} ({response.ReasonPhrase})";
+                                break;
                         }
+
+                        ShowError(errorMsg);
+
+                        return new CashierLoginResponse
+                        {
+                            Status = (int)statusCode,
+                            Message = errorMsg
+                        };
+                    }
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    if (string.IsNullOrWhiteSpace(responseString))
+                    {
+                        ShowError("Empty response received from server.");
+                        return new CashierLoginResponse { Status = 500, Message = "Empty server response" };
                     }
 
-                    return "false";
+                    try
+                    {
+                        var loginResponse = JsonConvert.DeserializeObject<CashierLoginResponse>(responseString);
+
+                        if (loginResponse == null)
+                        {
+                            ShowError("Invalid response format from server.");
+                            return new CashierLoginResponse { Status = 500, Message = "Invalid server response" };
+                        }
+
+                        return loginResponse;
+                    }
+                    catch (System.Text.Json.JsonException)
+                    {
+                        ShowError("Failed to parse server response.");
+                        return new CashierLoginResponse { Status = 500, Message = "Response parsing error" };
+                    }
+                    
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error validating credentials: {ex}");
-                return "false";
+                ShowError($"Error : {ex}");
+                return new CashierLoginResponse { Status = 500, Message = $"Invalid server response {ex}" };
             }
         }
+        private void ShowError(string message)
+        {
+            System.Windows.MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
 
-        private async Task<int?> PostDenominationData()
+
+        private async Task<int?> PostDenominationData(int? recordId = null , int? authId = null)
         {
             try
             {
@@ -631,7 +748,12 @@ namespace Deno.Services
                         PosNumber = GlobalStateService.Instance.PosNumber,
                         LocCode = GlobalStateService.Instance.LocCode,
                         UserId = GlobalStateService.Instance.UserId,
-                        UserName = GlobalStateService.Instance.Username
+                        UserName = GlobalStateService.Instance.Username,
+
+
+                        RecordId = recordId.HasValue ? recordId.Value : (int?)null,
+                        AuthId = authId.HasValue ? authId.Value : (int?)null
+
                     };
                       
                     if (GrandTotal == 0)
@@ -643,7 +765,7 @@ namespace Deno.Services
                         return null;
                     }
 
-                    var json = JsonSerializer.Serialize(postData, new JsonSerializerOptions
+                    var json = System.Text.Json.JsonSerializer.Serialize(postData, new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                     });
@@ -656,7 +778,7 @@ namespace Deno.Services
                     if (response.IsSuccessStatusCode)
                     {
                         var responseJson = await response.Content.ReadAsStringAsync();
-                        var responseData = JsonSerializer.Deserialize<Dictionary<string, object>>(responseJson);
+                        var responseData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(responseJson);
 
                         if (responseData != null && responseData.TryGetValue("id", out object idObj))
                         {
@@ -785,6 +907,12 @@ namespace Deno.Services
 
             [JsonPropertyName("id")]
             public int Id { get; set; }
+
+            [JsonPropertyName("existing_record_id")]
+            public int RecordId { get; set; }
+
+            [JsonPropertyName("approved_by")]
+            public int AutId { get; set; }
         }
 
 
@@ -883,5 +1011,6 @@ namespace Deno.Services
 
         public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
         public void Execute(object parameter) => _execute(parameter);
+     
     }
-}
+    }
