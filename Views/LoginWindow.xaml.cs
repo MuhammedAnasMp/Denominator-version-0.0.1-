@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Deployment.Application;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 namespace Deno.Views
 {
@@ -36,10 +37,18 @@ namespace Deno.Views
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             UsernameBox.Focus();
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            string versionString = version.ToString(); 
+            
 
-            VersionTextBlock.Text = "Version: " + versionString;
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                var publishVersion = ApplicationDeployment.CurrentDeployment.CurrentVersion;
+                VersionTextBlock.Text = "Version: " + publishVersion.ToString();
+            }
+            else
+            {
+                VersionTextBlock.Text = "Version In Development";
+            }
+
         }
 
         private void UsernameBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
