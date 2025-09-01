@@ -5,7 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Deno.Behaviors"
-	  xmlns:converters="clr-namespace:Deno.Converters"
+      xmlns:converters="clr-namespace:Deno.Converters"
       mc:Ignorable="d">
 
 	<!-- Background Gradient -->
@@ -22,7 +22,7 @@
 
 		<!-- Inverted Boolean Converter for IsEnabled -->
 		<local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-		<converters:BooleanToButtonContentConverter x:Key="BooleanToButtonContentConverter"/>
+		<converters:ButtonContentMultiConverter x:Key="ButtonContentMultiConverter" />
 		<!-- Card Style -->
 		<Style x:Key="CardStyle" TargetType="Border">
 			<Setter Property="Background" Value="White"/>
@@ -163,8 +163,8 @@
 	<Grid>
 		<!-- Main Content Grid (with blur effect) -->
 		<Grid Margin="0"
-			  IsEnabled="{Binding IsLoading, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"
-			  Style="{StaticResource MainGridStyle}">
+              IsEnabled="{Binding IsLoading, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"
+              Style="{StaticResource MainGridStyle}">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"/>
 				<!-- Header -->
@@ -180,17 +180,17 @@
 					<StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
 						<Ellipse Width="8" Height="8" Fill="#10b981" Margin="0,0,6,0"/>
 						<TextBlock Text="{Binding WelcomeText, ElementName=HomePageRoot}"
-								   FontSize="18"
-								   FontWeight="Bold"
-								   Foreground="#1f2937"
-								   VerticalAlignment="Center"/>
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#1f2937"
+                                   VerticalAlignment="Center"/>
 					</StackPanel>
 
 					<Button Content="Logout"
-							Command="{Binding LogoutCommand, ElementName=HomePageRoot}"
-							Style="{StaticResource DangerButton}"
-							DockPanel.Dock="Right"
-							Padding="12,6"/>
+                            Command="{Binding LogoutCommand, ElementName=HomePageRoot}"
+                            Style="{StaticResource DangerButton}"
+                            DockPanel.Dock="Right"
+                            Padding="12,6"/>
 				</DockPanel>
 			</Border>
 
@@ -206,12 +206,12 @@
 								</Border>
 								<StackPanel>
 									<TextBlock Text="Coins"
-											   FontSize="20"
-											   FontWeight="Bold"
-											   Foreground="#1f2937"/>
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="#1f2937"/>
 									<TextBlock Text="Enter coin quantities"
-											   FontSize="14"
-											   Foreground="#6b7280"/>
+                                               FontSize="14"
+                                               Foreground="#6b7280"/>
 								</StackPanel>
 							</StackPanel>
 
@@ -219,9 +219,9 @@
 								<ItemsControl.ItemTemplate>
 									<DataTemplate>
 										<Border Background="#f8fafc"
-												CornerRadius="1"
-												Padding="8"
-												Margin="0,0,0,4">
+                                                CornerRadius="1"
+                                                Padding="8"
+                                                Margin="0,0,0,4">
 											<Grid>
 												<Grid.ColumnDefinitions>
 													<ColumnDefinition Width="60"/>
@@ -231,31 +231,38 @@
 
 												<Border Background="#e0e7ff" CornerRadius="6" Padding="6,3">
 													<TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}"
-															   VerticalAlignment="Center"
-															   HorizontalAlignment="Center"
-															   FontSize="12"
-															   FontWeight="SemiBold"
-															   Foreground="#3730a3"/>
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"
+                                                               FontSize="12"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#3730a3"/>
 												</Border>
 
 												<TextBox Grid.Column="1"
-														 Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
-														 Margin="8,0"
-														 GotFocus="TextBox_GotFocus">
+                                                         Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                                         Margin="8,0"
+                                                         GotFocus="TextBox_GotFocus">
 													<TextBox.Style>
 														<Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
 															<Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+															<Setter Property="IsEnabled" Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
+															<Style.Triggers>
+																<Trigger Property="IsEnabled" Value="False">
+																	<Setter Property="Background" Value="#e5e7eb"/>
+																	<Setter Property="Foreground" Value="#6b7280"/>
+																</Trigger>
+															</Style.Triggers>
 														</Style>
 													</TextBox.Style>
 												</TextBox>
 
 												<Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="6,3">
 													<TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
-															   VerticalAlignment="Center"
-															   HorizontalAlignment="Center"
-															   FontWeight="Bold"
-															   FontSize="14"
-															   Foreground="#166534"/>
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"
+                                                               FontWeight="Bold"
+                                                               FontSize="14"
+                                                               Foreground="#166534"/>
 												</Border>
 											</Grid>
 										</Border>
@@ -274,12 +281,12 @@
 								</Border>
 								<StackPanel>
 									<TextBlock Text="Notes"
-											   FontSize="20"
-											   FontWeight="Bold"
-											   Foreground="#1f2937"/>
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="#1f2937"/>
 									<TextBlock Text="Enter note quantities"
-											   FontSize="14"
-											   Foreground="#6b7280"/>
+                                               FontSize="14"
+                                               Foreground="#6b7280"/>
 								</StackPanel>
 							</StackPanel>
 
@@ -296,31 +303,38 @@
 
 												<Border Background="#ede9fe" CornerRadius="6" Padding="8,4">
 													<TextBlock Text="{Binding Denomination, StringFormat='{}{0}'}"
-															   VerticalAlignment="Center"
-															   HorizontalAlignment="Center"
-															   FontSize="12"
-															   FontWeight="SemiBold"
-															   Foreground="#6b21a8"/>
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"
+                                                               FontSize="12"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#6b21a8"/>
 												</Border>
 
 												<TextBox Grid.Column="1"
-														 Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
-														 Margin="12,0"
-														 GotFocus="TextBox_GotFocus">
+                                                         Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                                         Margin="12,0"
+                                                         GotFocus="TextBox_GotFocus">
 													<TextBox.Style>
 														<Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
 															<Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+															<Setter Property="IsEnabled" Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
+															<Style.Triggers>
+																<Trigger Property="IsEnabled" Value="False">
+																	<Setter Property="Background" Value="#e5e7eb"/>
+																	<Setter Property="Foreground" Value="#6b7280"/>
+																</Trigger>
+															</Style.Triggers>
 														</Style>
 													</TextBox.Style>
 												</TextBox>
 
 												<Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="8,4">
 													<TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
-															   VerticalAlignment="Center"
-															   HorizontalAlignment="Center"
-															   FontWeight="Bold"
-															   FontSize="14"
-															   Foreground="#166534"/>
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"
+                                                               FontWeight="Bold"
+                                                               FontSize="14"
+                                                               Foreground="#166534"/>
 												</Border>
 											</Grid>
 										</Border>
@@ -347,27 +361,27 @@
 					<StackPanel Grid.Column="0" HorizontalAlignment="Center">
 						<TextBlock Text="Coins Total" FontSize="12" Foreground="#92400e" FontWeight="SemiBold"/>
 						<TextBlock Text="{Binding CoinTotal, StringFormat='{}{0:F3}'}"
-								   FontSize="16" FontWeight="Bold" Foreground="#92400e"/>
+                                   FontSize="16" FontWeight="Bold" Foreground="#92400e"/>
 					</StackPanel>
 
 					<StackPanel Grid.Column="1" HorizontalAlignment="Center">
 						<TextBlock Text="Notes Total" FontSize="12" Foreground="#6b21a8" FontWeight="SemiBold"/>
 						<TextBlock Text="{Binding NoteTotal, StringFormat='{}{0:F3}'}"
-								   FontSize="16" FontWeight="Bold" Foreground="#6b21a8"/>
+                                   FontSize="16" FontWeight="Bold" Foreground="#6b21a8"/>
 					</StackPanel>
 
 					<StackPanel Grid.Column="2" HorizontalAlignment="Center">
 						<TextBlock Text="Grand Total" FontSize="12" Foreground="#166534" FontWeight="SemiBold"/>
 						<TextBlock Text="{Binding GrandTotal, StringFormat='{}{0:F3}'}"
-								   FontSize="20" FontWeight="Bold" Foreground="#166534"/>
+                                   FontSize="20" FontWeight="Bold" Foreground="#166534"/>
 					</StackPanel>
 
 					<!-- Buttons -->
 					<Button Content="Reset All"
-							Command="{Binding ResetCommand}"
-							Grid.Column="3"
-							Margin="16,0,8,0"
-							Padding="16,8">
+                            Command="{Binding ResetCommand}"
+                            Grid.Column="3"
+                            Margin="16,0,8,0"
+                            Padding="16,8">
 						<Button.Style>
 							<Style TargetType="Button" BasedOn="{StaticResource ModernButton}">
 								<Setter Property="Background" Value="#6b7280"/>
@@ -384,41 +398,38 @@
 					</Button>
 
 					<Button Command="{Binding PostToApiCommand}"
-						CommandParameter="{Binding DataContext.UpdatingRecordId, RelativeSource={RelativeSource AncestorType=Page}}"
-						Style="{StaticResource SuccessButton}"
-						Grid.Column="4"
-						Margin="8,0,0,0"
-						Padding="24,8">
-
+                            CommandParameter="{Binding DataContext.UpdatingRecordId, RelativeSource={RelativeSource AncestorType=Page}}"
+                            Style="{StaticResource SuccessButton}"
+                            Grid.Column="4"
+                            Margin="8,0,0,0"
+                            Padding="24,8">
 						<Button.Content>
 							<TextBlock>
 								<TextBlock.Text>
-									<Binding Path="UpdatingRecord" Converter="{StaticResource BooleanToButtonContentConverter}">
-										<Binding.FallbackValue>Submit</Binding.FallbackValue>
-									</Binding>
+									<MultiBinding Converter="{StaticResource ButtonContentMultiConverter}">
+										<Binding Path="UpdatingRecord" />
+										<Binding Path="EditMod" />
+									</MultiBinding>
 								</TextBlock.Text>
 							</TextBlock>
 						</Button.Content>
 					</Button>
-					
-					
-
 				</Grid>
 			</Border>
 		</Grid>
 
 		<!-- Loading Overlay (outside the blurred grid) -->
 		<Grid Background="#00000033"
-			  Visibility="{Binding IsLoading, ElementName=HomePageRoot, Converter={StaticResource BooleanToVisibilityConverter}}">
+              Visibility="{Binding IsLoading, ElementName=HomePageRoot, Converter={StaticResource BooleanToVisibilityConverter}}">
 			<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 				<TextBlock Text="⌛"
-						   Style="{StaticResource LoadingIconStyle}"
-						   Width="40" Height="40"/>
+                           Style="{StaticResource LoadingIconStyle}"
+                           Width="40" Height="40"/>
 				<TextBlock Text="Loading..."
-						   FontSize="14"
-						   Foreground="#4f46e5"
-						   Margin="0,8,0,0"
-						   HorizontalAlignment="Center"/>
+                           FontSize="14"
+                           Foreground="#4f46e5"
+                           Margin="0,8,0,0"
+                           HorizontalAlignment="Center"/>
 			</StackPanel>
 		</Grid>
 	</Grid>

@@ -87,6 +87,7 @@ namespace Deno.Views
                                 Console.WriteLine($"API Data: KD_025={data.Kd025}, NoteTotal={data.NoteTotal}");
                                 UpdateQuantitiesFromApi(data);
                                 _currencyService.UpdatingRecord = true;
+                                _currencyService.EditMod = true;
                                 // In LoadDenominationDataAsync or UpdateQuantitiesFromApi
                                 _currencyService.UpdatingRecordId = result.Id;
                                 WelcomeText = $"You can update your record.";

@@ -92,6 +92,20 @@ namespace Deno.Services
 
 
 
+        private int _higherUserID;
+
+        public int HigherUserID
+        {
+            get => _higherUserID;
+            set
+            {
+                _higherUserID = value;
+                OnPropertyChanged(nameof(HigherUserID));
+            }
+        }
+
+
+
         private bool _isPosting = false;
         private List<CoinViewModel> _coinViewModels;
         public List<CoinViewModel> CoinViewModels
@@ -224,6 +238,11 @@ namespace Deno.Services
 
         private void Reset(object parameter)
         {
+            if (EditMod)
+            {
+                //MessageBox.Show("Unlock is required");
+                return;
+            }
             foreach (var coin in CoinViewModels)
                 coin.Quantity = 0;
             foreach (var note in NoteViewModels)
@@ -562,34 +581,30 @@ namespace Deno.Services
 
         private async void PostToApi(object parameter)
         {
+            
+
+
 
 
          
             try
             {
-                if (_isPosting)
-                    return;
-                _isPosting = true;
-                CommandManager.InvalidateRequerySuggested(); // disables the button
-
-                if (parameter is int updatingRecordId && updatingRecordId != 0)
+                if (EditMod)
                 {
-
-               
                     var authDialog = new AuthDialog();
                     if (authDialog.ShowDialog() != true)
-                        {
-                            MessageBox.Show("Authentication cancelled.");
-                            return;
-                        }
+                    {
+                        //MessageBox.Show("Authentication cancelled.");
+                        return;
+                    }
 
                     string password = authDialog.Password;
 
-               
+
                     var loginSuccess = await ValidateManagerCredentials(authDialog.Id, password);
 
-                    if(loginSuccess == null || loginSuccess.Status != 200)
-{
+                    if (loginSuccess == null || loginSuccess.Status != 200)
+                    {
                         MessageBox.Show("Authentication failed");
                         return;
                     }
@@ -605,6 +620,24 @@ namespace Deno.Services
                         MessageBox.Show("Invalid login credentials");
                         return;
                     }
+                    HigherUserID = loginSuccess.Id;
+                    EditMod = false;
+                    return;
+                }
+
+
+                if (_isPosting)
+                    return;
+                _isPosting = true;
+                CommandManager.InvalidateRequerySuggested(); // disables the button
+
+                
+
+                if (parameter is int updatingRecordId && updatingRecordId != 0)
+                {
+
+               
+                    
 
 
 
@@ -612,7 +645,7 @@ namespace Deno.Services
                     // dont reset the existing quantitys because method is updating 
 
 
-                    int? updatedId = await PostDenominationData(updatingRecordId , loginSuccess.Id);
+                    int? updatedId = await PostDenominationData(updatingRecordId , HigherUserID);
                     if (updatedId.HasValue)
                     {
 
