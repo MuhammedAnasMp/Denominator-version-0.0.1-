@@ -20,6 +20,13 @@ namespace Deno.Services
         private string _userId = "";
         private string _auth = "";
         private string _locName = "";
+        private string _deveIp = "";
+
+        public string DeveIp
+        {
+            get => _deveIp;
+            set { _deveIp = value ?? ""; OnPropertyChanged(nameof(DeveIp)); }
+        }
 
         public string LocName
         {
@@ -107,7 +114,8 @@ namespace Deno.Services
                     IsLoggedIn = IsLoggedIn,
                     Username = Username,
                     UserId = UserId,
-                    Auth = Auth
+                    Auth = Auth ,
+                    DevIp = DeveIp
                 };
 
                 Directory.CreateDirectory(Path.GetDirectoryName(SettingsFilePath));
@@ -142,6 +150,7 @@ namespace Deno.Services
                     Username = settings.Username ?? "";
                     UserId = settings.UserId ?? "";
                     Auth = settings.Auth ?? "";
+                    DeveIp = settings.DevIp ?? "";
 
                     Console.WriteLine($"Settings loaded: LocCode={LocCode}, PosNumber={PosNumber}, DomainName={DomainName}, CurrencyCode={CurrencyCode}, IsLoggedIn={IsLoggedIn}, Username={Username}, UserId={UserId}, Auth={Auth}");
                 }
@@ -153,11 +162,12 @@ namespace Deno.Services
                     PrinterName = "";
                     PosNumber = "";
                     DomainName = "";
-                    CurrencyCode = "AED";
+                    CurrencyCode = "KWD";
                     IsLoggedIn = false;
                     Username = "";
                     UserId = "";
                     Auth = "";
+                    DeveIp = "";
 
                 }
             }
@@ -180,6 +190,7 @@ namespace Deno.Services
 
     public class AppSettings
     {
+        public string DevIp { get; set; }
         public string LocName { get; set; }
         public string LocCode { get; set; }
         public string PosNumber { get; set; }

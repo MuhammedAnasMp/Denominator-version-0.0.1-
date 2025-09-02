@@ -3,13 +3,18 @@ using PrintHTML.Core.Helpers;
 using PrintHTML.Core.Services;
 using System;
 using System.Drawing.Printing;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Controls;
-
 namespace Deno.Views
 {
     public partial class ConfigPage : UserControl
     {
+        private string localIP;
+
         public ConfigPage()
         {
             InitializeComponent();
@@ -21,7 +26,18 @@ namespace Deno.Views
             // Set selected item based on loaded CurrencyCode
             CurrencyPicker.SelectedItem = GlobalStateService.Instance.CurrencyCode ?? "KWD";
 
-      
+             localIP = NetworkInterface.GetAllNetworkInterfaces()
+             .Where(nic => nic.OperationalStatus == OperationalStatus.Up &&
+                           nic.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                           nic.NetworkInterfaceType != NetworkInterfaceType.Tunnel)
+             .SelectMany(nic => nic.GetIPProperties().UnicastAddresses)
+             .Where(ip => ip.Address.AddressFamily == AddressFamily.InterNetwork)
+             .Select(ip => ip.Address.ToString())
+             .FirstOrDefault();
+
+            DeviceIpTextBox.Text = localIP ?? "Not found";
+
+            DeviceIpTextBox.Text = localIP ?? "Not found";
         }
 
         private void CurrencyPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -131,13 +147,7 @@ namespace Deno.Views
         {
             try
             {
-                // Log values before saving
-                Console.WriteLine($"Saving: LocCode={GlobalStateService.Instance.LocCode}, " +
-                                  $"PosNumber={GlobalStateService.Instance.PosNumber}, " +
-                                  $"DomainName={GlobalStateService.Instance.DomainName}, " +
-                                  $"CurrencyCode={GlobalStateService.Instance.CurrencyCode}");
-
-                // Save settings to JSON file
+              
                 GlobalStateService.Instance.SaveSettings();
 
                 if (GlobalStateService.Instance.Auth == "configuration")
@@ -146,6 +156,7 @@ namespace Deno.Views
                     GlobalStateService.Instance.Username = "";
                     GlobalStateService.Instance.UserId = "";
                     GlobalStateService.Instance.Auth = "";
+                    GlobalStateService.Instance.DeveIp = localIP;
                     GlobalStateService.Instance.SaveSettings();
                     LoginWindow login = new LoginWindow();
                     login.Show();
@@ -160,6 +171,7 @@ namespace Deno.Views
                     GlobalStateService.Instance.Username = "";
                     GlobalStateService.Instance.UserId = "";
                     GlobalStateService.Instance.Auth = "";
+                    GlobalStateService.Instance.DeveIp = localIP;
                     GlobalStateService.Instance.SaveSettings();
                     LoginWindow login = new LoginWindow();
                     login.Show();

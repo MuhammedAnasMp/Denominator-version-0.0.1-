@@ -75,9 +75,16 @@
                       Margin="0,0,0,10"
                       SelectionChanged="CurrencyPicker_SelectionChanged"/>
 
+			<TextBlock Text="Device IP" FontWeight="Bold" Margin="0,10,0,5"/>
+			<TextBox x:Name="DeviceIpTextBox"
+                     IsReadOnly="True"
+                     Style="{StaticResource ModernTextBox}"/>
+			
 			<TextBlock Text="Location Code" FontWeight="Bold" Margin="0,10,0,5"/>
 			<TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=LocCode, Mode=TwoWay}"
                      Style="{StaticResource ModernTextBox}"/>
+
+			
 
 			<TextBlock Text="Location Name" FontWeight="Bold" Margin="0,10,0,5"/>
 			<TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=LocName, Mode=TwoWay}"
