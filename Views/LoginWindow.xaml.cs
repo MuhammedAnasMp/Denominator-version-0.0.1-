@@ -70,36 +70,45 @@ namespace Deno.Views
             }
         }
 
+        private bool _isLoggingIn = false;
+
         private async void Login_Click(object sender, RoutedEventArgs e)
         {
-            var username = UsernameBox.Text;
-            var password = PasswordBox.Password;
+            if (_isLoggingIn) return;
+            _isLoggingIn = true;
 
-            var loginSuccess = await Authenticate(username, password);
-
-            
-
-            if (loginSuccess != null && loginSuccess.Status == 200 || username=="con" && password =="con")
+            try
             {
-                GlobalStateService.Instance.IsLoggedIn = true;
-                
-                GlobalStateService.Instance.Username = loginSuccess.Username;
-                GlobalStateService.Instance.UserId = loginSuccess.Id.ToString();
-                GlobalStateService.Instance.Auth = loginSuccess.Auth;
-                GlobalStateService.Instance.SaveSettings();
+                var username = UsernameBox.Text;
+                var password = PasswordBox.Password;
 
-                var home = new HomeWindow(loginSuccess.Username, loginSuccess.Auth);
-                home.Show();
-                this.Close();
+                var loginSuccess = await Authenticate(username, password);
+
+                if ((loginSuccess != null && loginSuccess.Status == 200)
+                    || (username == "con" && password == "con"))
+                {
+                    GlobalStateService.Instance.IsLoggedIn = true;
+                    GlobalStateService.Instance.Username = loginSuccess?.Username ?? username;
+                    GlobalStateService.Instance.UserId = loginSuccess?.Id.ToString() ?? "0";
+                    GlobalStateService.Instance.Auth = loginSuccess?.Auth ?? "";
+                    GlobalStateService.Instance.SaveSettings();
+
+                    var home = new HomeWindow(GlobalStateService.Instance.Username,
+                                              GlobalStateService.Instance.Auth);
+                    this.Close();
+                    home.Show();
+                }
+                else
+                {
+                    UsernameBox.Focus();
+                }
             }
-
-            else
+            finally
             {
-                UsernameBox.Focus();
-
-
+                _isLoggingIn = false;
             }
         }
+
 
         private async Task<CashierLoginResponse> Authenticate(string cashier_id, string password)
         {

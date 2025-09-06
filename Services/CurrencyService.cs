@@ -92,15 +92,15 @@ namespace Deno.Services
 
 
 
-        private int _higherUserID;
+        private int _authorizedBy;
 
-        public int HigherUserID
+        public int AuthorizedBy
         {
-            get => _higherUserID;
+            get => _authorizedBy;
             set
             {
-                _higherUserID = value;
-                OnPropertyChanged(nameof(HigherUserID));
+                _authorizedBy = value;
+                OnPropertyChanged(nameof(AuthorizedBy));
             }
         }
 
@@ -253,7 +253,21 @@ namespace Deno.Services
             OnPropertyChanged(nameof(NoteTotal));
             OnPropertyChanged(nameof(GrandTotal));
         }
+        public static string FormatDateWithAmPm(string apiDate)
+        {
+            if (string.IsNullOrWhiteSpace(apiDate))
+                return "";
 
+            // Parse string into DateTime
+            if (DateTime.TryParse(apiDate, null, DateTimeStyles.RoundtripKind, out DateTime dt))
+            {
+                return dt.ToString("dd-MMM-yyyy hh:mm tt", CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                return apiDate;
+            }
+        }
         private async void PrintReceipt(int createdId ,bool reset = true)
         {
             try
@@ -261,10 +275,10 @@ namespace Deno.Services
                 using (var client = new HttpClient())
                 {
                     var host = GlobalStateService.Instance.DomainName;
-
                     var UserId = GlobalStateService.Instance.UserId;
-                    var storeId = GlobalStateService.Instance.LocCode; 
-                    var response = await client.GetAsync($"http://{host}/api/denominations?Id={createdId}&StoreId={storeId}&UserId={UserId}");
+                    var locCode = GlobalStateService.Instance.LocCode;
+                  
+                    var response = await client.GetAsync($"http://{host}/api/denominations?Id={createdId}&LocCode={locCode}&UserId={UserId}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -400,7 +414,10 @@ namespace Deno.Services
                                                 <span class='info-item'>Date: <strong>{data.CreatedDt:dd-MMM-yy}</strong></span>
                                                 <span class='info-item'>ID: <strong>{data.CreatedById}</strong></span>
                                                 <br/>
-                                                <span class='info-item'>Name: <strong>{data.CreatedByName}</strong></span>
+                                                <span class='info-item'>Name: <strong>{data.CreatedByName}</strong></span><br/>
+                                                <p>First Bill: {FormatDateWithAmPm(data.FirstBill)}</p><br/>
+                                               <p>Last Bill: {FormatDateWithAmPm(data.LastBill)}</p> <br/>
+                                               <p> Revision Count : {data.UpdatedCount}
                                             </div>
                                         </div>
                                         <div>
@@ -502,7 +519,8 @@ namespace Deno.Services
                                         </table>
                                             
                                             <div class='footer'>
-                                            <p>Generated on: {DateTime.Now:dd-MMM-yyyy HH:mm}</p>
+                                               <p>Generated on: {DateTime.Now:dd-MMM-yyyy HH:mm}</p> 
+                                              
                                                 </div>
                                              </div>
 
@@ -581,11 +599,7 @@ namespace Deno.Services
 
         private async void PostToApi(object parameter)
         {
-            
-
-
-
-
+           
          
             try
             {
@@ -605,7 +619,7 @@ namespace Deno.Services
 
                     if (loginSuccess == null || loginSuccess.Status != 200)
                     {
-                        MessageBox.Show("Authentication failed");
+                        //MessageBox.Show("Authentication failed");
                         return;
                     }
 
@@ -620,7 +634,7 @@ namespace Deno.Services
                         MessageBox.Show("Invalid login credentials");
                         return;
                     }
-                    HigherUserID = loginSuccess.Id;
+                    AuthorizedBy = loginSuccess.Id;
                     EditMod = false;
                     return;
                 }
@@ -636,8 +650,7 @@ namespace Deno.Services
                 if (parameter is int updatingRecordId && updatingRecordId != 0)
                 {
 
-               
-                    
+
 
 
 
@@ -645,15 +658,13 @@ namespace Deno.Services
                     // dont reset the existing quantitys because method is updating 
 
 
-                    int? updatedId = await PostDenominationData(updatingRecordId , HigherUserID);
+                    int? updatedId = await PostDenominationData(updatingRecordId , AuthorizedBy);
                     if (updatedId.HasValue)
                     {
 
                         PrintReceipt((int)updatedId , false);
 
                     }
-
-
                 }
 
                 else
@@ -662,6 +673,7 @@ namespace Deno.Services
                     int? createdId = await PostDenominationData();
                     if (createdId.HasValue)
                     {
+
 
                         PrintReceipt((int)createdId);
 
@@ -753,6 +765,15 @@ namespace Deno.Services
                     
                 }
             }
+            catch (FormatException)
+            {
+                ShowError("ID and Password must be numbers.");
+                return new CashierLoginResponse
+                {
+                    Status = 400,
+                    Message = "ID and Password must be numbers."
+                };
+            }
             catch (Exception ex)
             {
                 ShowError($"Error : {ex}");
@@ -765,7 +786,7 @@ namespace Deno.Services
         }
 
 
-        private async Task<int?> PostDenominationData(int? recordId = null , int? authId = null)
+        private async Task<int?> PostDenominationData(int? updatingRecordId = null , int? authorizedBy = null)
         {
             try
             {
@@ -794,10 +815,10 @@ namespace Deno.Services
                         LocCode = GlobalStateService.Instance.LocCode,
                         UserId = GlobalStateService.Instance.UserId,
                         UserName = GlobalStateService.Instance.Username,
+                        DevIp = GlobalStateService.Instance.DeveIp,
 
-
-                        RecordId = recordId.HasValue ? recordId.Value : (int?)null,
-                        AuthId = authId.HasValue ? authId.Value : (int?)null
+                        UpdatingRecordId = updatingRecordId.HasValue ? updatingRecordId.Value : (int?)null,
+                        AuthorizedBy = authorizedBy.HasValue ? authorizedBy.Value : (int?)null
                 
                     };
                       
@@ -829,7 +850,9 @@ namespace Deno.Services
                         {
                             if (int.TryParse(idObj?.ToString(), out int id))
                             {
-                       
+                                UpdatingRecord = true;
+                                UpdatingRecordId = id;
+                                EditMod = true;
                                 return id;
                             }
                             else
@@ -881,8 +904,7 @@ namespace Deno.Services
             [JsonPropertyName("transaction_report")]
             public   Dictionary<string, List<TransactionEntry>> Transaction { get; set; }
 
-            [JsonPropertyName("counted_by")]
-            public string CountedBy { get; set; }
+       
         }
         public class TransactionEntry
         {
@@ -893,43 +915,43 @@ namespace Deno.Services
 
         public class DenominationData
         {
-            [JsonPropertyName("kd_0005")]
+            [JsonPropertyName("FILS_005")]
             public int Kd0005 { get; set; }
 
-            [JsonPropertyName("kd_001")]
+            [JsonPropertyName("FILS_010")]
             public int Kd001 { get; set; }
 
-            [JsonPropertyName("kd_002")]
+            [JsonPropertyName("FILS_020")]
             public int Kd002 { get; set; }
 
-            [JsonPropertyName("kd_005")]
+            [JsonPropertyName("FILS_050")]
             public int Kd005 { get; set; }
 
-            [JsonPropertyName("kd_01")]
+            [JsonPropertyName("FILS_100")]
             public int Kd01 { get; set; }
 
-            [JsonPropertyName("kd_025")]
+            [JsonPropertyName("FILS_250")]
             public int Kd025 { get; set; }
 
-            [JsonPropertyName("kd_05")]
+            [JsonPropertyName("FILS_500")]
             public int Kd05 { get; set; }
 
-            [JsonPropertyName("kd_1")]
+            [JsonPropertyName("KD_1")]
             public int Kd1 { get; set; }
 
-            [JsonPropertyName("kd_5")]
+            [JsonPropertyName("KD_5")]
             public int Kd5 { get; set; }
 
-            [JsonPropertyName("kd_10")]
+            [JsonPropertyName("KD_10")]
             public int Kd10 { get; set; }
 
-            [JsonPropertyName("kd_20")]
+            [JsonPropertyName("KD_20")]
             public int Kd20 { get; set; }
 
             [JsonPropertyName("coin_total")]
             public double CoinTotal { get; set; }
 
-            [JsonPropertyName("note_total")]
+            [JsonPropertyName("currency_total")]
             public double NoteTotal { get; set; }
 
             [JsonPropertyName("grand_total")]
@@ -942,12 +964,12 @@ namespace Deno.Services
             public string PosNumber { get; set; }
 
             [JsonPropertyName("loc_code")]
-            public string LocCode { get; set; }
+            public int LocCode { get; set; }
 
-            [JsonPropertyName("created_by_name")]
+            [JsonPropertyName("cashier_name")]
             public string CreatedByName { get; set; }
 
-            [JsonPropertyName("created_by_id")]
+            [JsonPropertyName("cashier_id")]
             public int CreatedById { get; set; }
 
             [JsonPropertyName("id")]
@@ -958,6 +980,17 @@ namespace Deno.Services
 
             [JsonPropertyName("approved_by")]
             public int AutId { get; set; }
+
+            [JsonPropertyName("first_bill")]
+            public string FirstBill { get; set; }
+
+            [JsonPropertyName("last_bill")]
+            public string LastBill { get; set; }
+
+            [JsonPropertyName("reprint_count")]
+
+            public int UpdatedCount { get; set; }
+
         }
 
 
@@ -972,11 +1005,7 @@ namespace Deno.Services
             [JsonPropertyName("status")]
             public int Status { get; set; }
 
-            [JsonPropertyName("counted_by")]
-            public string CountedBy { get; set; }
-
-            //[JsonPropertyName("data")]
-            //public string Message { get; set; }
+          
 
         }
     }

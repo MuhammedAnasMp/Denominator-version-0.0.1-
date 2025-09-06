@@ -116,7 +116,7 @@
 				</StackPanel>
 
 				<!-- Login Button -->
-				<Button Grid.Row="3" Content="Login" Margin="0,15,0,0" Click="Login_Click"/>
+				<Button  Grid.Row="3" Content="Login" Margin="0,15,0,0" Click="Login_Click"/>
 
 				<TextBlock Name="VersionTextBlock" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="10" Foreground="#6B7280" Margin="0,10,0,0"/>
 			</Grid>

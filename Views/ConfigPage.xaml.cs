@@ -5,8 +5,12 @@ using System;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 namespace Deno.Views
@@ -48,6 +52,57 @@ namespace Deno.Views
                 Console.WriteLine($"CurrencyPicker changed: CurrencyCode={GlobalStateService.Instance.CurrencyCode}");
             }
         }
+
+        private async void OnTestDomainClicked(object sender, RoutedEventArgs e)
+        {
+            string domain = DomainNameTextBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(domain))
+            {
+                MessageBox.Show("Please enter a valid domain.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                string url = domain.StartsWith("http") ? domain : $"http://{domain}/";
+
+                using (HttpClient client = new HttpClient())
+                {
+                   
+                    var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await client.PostAsync(url, content);
+
+                    response.EnsureSuccessStatusCode();
+
+                    string responseContent = await response.Content.ReadAsStringAsync();
+
+                
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var result = JsonSerializer.Deserialize<ApiResponse>(responseContent, options);
+
+                    MessageBox.Show($"App Name: {result.AppName}\nApp Version: {result.AppVersion}",
+                                    "API Response", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"API call failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public class ApiResponse
+        {
+            [JsonPropertyName("app_name")]
+            public string AppName { get; set; }
+
+            [JsonPropertyName("app_version")]
+            public string AppVersion { get; set; }
+        }
+
+
+    
 
         private void OnTestPrinterClicked(object sender, RoutedEventArgs e)
         {
@@ -119,9 +174,9 @@ namespace Deno.Views
                     <body>
                         <div class=""test-page"">
                             <h1>PRINTER TEST OK</h1>
-                            <p><strong>Printer Model:</strong> " + printerName + @"</p>
-                            <p><strong>Date:</strong> " + currentDate + @"</p>
-                            <p><strong>Test Type:</strong> Print Test Page</p>
+                            <p><strong>Printer Name:</strong> " + printerName + @"</p> <br/>
+                            <p><strong>Date:</strong> " + currentDate + @"</p><br/>
+                            <p><strong>Test Type:</strong> Print Test Page</p><br/>
                             <hr>
                        
                           

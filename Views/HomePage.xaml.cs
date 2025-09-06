@@ -67,8 +67,8 @@ namespace Deno.Views
                 {
                     var host = _globalStateService.DomainName;
                     var userId = _globalStateService.UserId;
-                    var storeId = _globalStateService.LocCode;
-                    var response = await client.GetAsync($"http://{host}/check_exist_history?Id=0&StoreId={storeId}&UserId={userId}");
+                    var locCode = _globalStateService.LocCode;
+                    var response = await client.GetAsync($"http://{host}/existing_history?Id=0&LocCode={locCode}&UserId={userId}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -84,15 +84,15 @@ namespace Deno.Views
                             {
                                 var data = result.Data[0];
 
-                                Console.WriteLine($"API Data: KD_025={data.Kd025}, NoteTotal={data.NoteTotal}");
                                 UpdateQuantitiesFromApi(data);
                                 _currencyService.UpdatingRecord = true;
                                 _currencyService.EditMod = true;
-                                // In LoadDenominationDataAsync or UpdateQuantitiesFromApi
+
+
                                 _currencyService.UpdatingRecordId = result.Id;
                                 WelcomeText = $"You can update your record.";
                                 IsLoading = false;
-                                MessageBox.Show($"Manager ID is required to update existing records. {result.Id}", "Update Required", MessageBoxButton.OK, MessageBoxImage.Information);
+                                //MessageBox.Show($"Manager ID is required to update existing records. {result.Id}", "Update Required", MessageBoxButton.OK, MessageBoxImage.Information);
                             }
                             else
                             {
