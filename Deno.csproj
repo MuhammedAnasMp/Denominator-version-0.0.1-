@@ -169,6 +169,9 @@
     <Compile Include="Views\ManagePage.xaml.cs">
       <DependentUpon>ManagePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviors\VirtualNumpad.xaml.cs">
+      <DependentUpon>VirtualNumpad.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -202,6 +205,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ManagePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Behaviors\VirtualNumpad.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

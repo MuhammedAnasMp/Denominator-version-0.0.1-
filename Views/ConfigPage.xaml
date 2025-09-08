@@ -127,7 +127,7 @@
                         Content="Check"
                         Style="{StaticResource ModernButton}"
                         Width="100"
-                        Click="OnTestDomainClicke"/>
+                        Click="OnTestDomainClicked"/>
 				
 			</Grid>
 			

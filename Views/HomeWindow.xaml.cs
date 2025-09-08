@@ -49,7 +49,7 @@ namespace Deno.Views
             switch (auth?.ToLower())
             {
                 case "cashier":
-                    HomeTab.Visibility = Visibility.Visible;
+                    HomeTab.Visibility = Visibility.Collapsed;
                     ManageTab.Visibility = Visibility.Collapsed;
                     ConfigTab.Visibility = Visibility.Collapsed;
                     break;
