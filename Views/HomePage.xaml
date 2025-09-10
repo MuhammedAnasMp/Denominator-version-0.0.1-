@@ -198,81 +198,91 @@
 			<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 				<UniformGrid Columns="2" HorizontalAlignment="Stretch">
 					<!-- Coins Card -->
-					<Border Style="{StaticResource CardStyle}">
-						<StackPanel>
-							<StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-								<Border Background="#fef3c7" CornerRadius="8" Width="40" Height="40" Margin="0,0,12,0">
-									<TextBlock Text="🪙" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-								</Border>
-								<StackPanel>
-									<TextBlock Text="Coins"
-                                               FontSize="20"
-                                               FontWeight="Bold"
-                                               Foreground="#1f2937"/>
-									<TextBlock Text="Enter coin quantities"
-                                               FontSize="14"
-                                               Foreground="#6b7280"/>
-								</StackPanel>
-							</StackPanel>
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                <Border Background="#fef3c7" CornerRadius="8" Width="40" Height="40" Margin="0,0,12,0">
+                                    <TextBlock Text="🪙" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel>
+                                    <TextBlock Text="Coins"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="#1f2937"/>
+                                    <TextBlock Text="Enter coin quantities"
+                           FontSize="14"
+                           Foreground="#6b7280"/>
+                                </StackPanel>
+                            </StackPanel>
 
-							<ItemsControl ItemsSource="{Binding CoinViewModels}">
-								<ItemsControl.ItemTemplate>
-									<DataTemplate>
-										<Border Background="#f8fafc"
-                                                CornerRadius="1"
-                                                Padding="8"
-                                                Margin="0,0,0,4">
-											<Grid>
-												<Grid.ColumnDefinitions>
-													<ColumnDefinition Width="60"/>
-													<ColumnDefinition Width="2*"/>
-													<ColumnDefinition Width="140"/>
-												</Grid.ColumnDefinitions>
+                            <ItemsControl x:Name="CoinsItemsControl" ItemsSource="{Binding CoinViewModels}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#f8fafc"
+                            CornerRadius="1"
+                            Padding="8"
+                            Margin="0,0,0,4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="60"/>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="140"/>
+                                                </Grid.ColumnDefinitions>
 
-												<Border Background="#e0e7ff" CornerRadius="6" Padding="6,3">
-													<TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}"
-                                                               VerticalAlignment="Center"
-                                                               HorizontalAlignment="Center"
-                                                               FontSize="12"
-                                                               FontWeight="SemiBold"
-                                                               Foreground="#3730a3"/>
-												</Border>
+                                                <Border Background="#e0e7ff" CornerRadius="6" Padding="6,3">
+                                                    <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="#3730a3"/>
+                                                </Border>
 
-												<TextBox Grid.Column="1"
-                                                         Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
-                                                         Margin="8,0"
-                                                         GotFocus="TextBox_GotFocus">
-													<TextBox.Style>
-														<Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
-															<Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
-															<Setter Property="IsEnabled" Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
-															<Style.Triggers>
-																<Trigger Property="IsEnabled" Value="False">
-																	<Setter Property="Background" Value="#e5e7eb"/>
-																	<Setter Property="Foreground" Value="#6b7280"/>
-																</Trigger>
-															</Style.Triggers>
-														</Style>
-													</TextBox.Style>
-												</TextBox>
+                                                <TextBox x:Name="CoinQuantityTextBox"
+                                     Grid.Column="1"
+                                     Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="8,0"
+                                     GotFocus="TextBox_GotFocus">
+                                                    <TextBox.Style>
+                                                        <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+                                                            <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                                            <Setter Property="IsEnabled" Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsEnabled" Value="False">
+                                                                    <Setter Property="Background" Value="#e5e7eb"/>
+                                                                    <Setter Property="Foreground" Value="#6b7280"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBox.Style>
+                                                </TextBox>
 
-												<Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="6,3">
-													<TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
-                                                               VerticalAlignment="Center"
-                                                               HorizontalAlignment="Center"
-                                                               FontWeight="Bold"
-                                                               FontSize="14"
-                                                               Foreground="#166534"/>
-												</Border>
-											</Grid>
-										</Border>
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
-							</ItemsControl>
-						</StackPanel>
-					</Border>
+                                                <Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="6,3">
+                                                    <TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#166534"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                                <!-- 
+                            <TextBox 
+                                Text="{Binding AllQuantitiesString, Mode=OneWay}" 
+					FontSize="14"
+					IsReadOnly="True"
+					AcceptsReturn="True"
+					TextWrapping="Wrap"
+					VerticalScrollBarVisibility="Auto -->
 
-					<!-- Notes Card -->
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Notes Card -->
 					<Border Style="{StaticResource CardStyle}">
 						<StackPanel>
 							<StackPanel Orientation="Horizontal" Margin="0,0,0,20">
@@ -290,6 +300,7 @@
 								</StackPanel>
 							</StackPanel>
 
+              
 							<ItemsControl ItemsSource="{Binding NoteViewModels}">
 								<ItemsControl.ItemTemplate>
 									<DataTemplate>
@@ -341,7 +352,8 @@
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>
 							</ItemsControl>
-						</StackPanel>
+                          <!--  <local:VirtualNumpad Grid.Row="1" Margin="10" /> -->
+                        </StackPanel>
 					</Border>
 				</UniformGrid>
 			</ScrollViewer>
@@ -375,8 +387,7 @@
 						<TextBlock Text="{Binding GrandTotal, StringFormat='{}{0:F3}'}"
                                    FontSize="20" FontWeight="Bold" Foreground="#166534"/>
 					</StackPanel>
-
-					<!-- Buttons -->
+                    <!-- Buttons -->
 					<Button Content="Reset All"
                             Command="{Binding ResetCommand}"
                             Grid.Column="3"
@@ -392,7 +403,11 @@
 									<Trigger Property="IsPressed" Value="True">
 										<Setter Property="Background" Value="#374151"/>
 									</Trigger>
+
 								</Style.Triggers>
+                                
+                                
+                                
 							</Style>
 						</Button.Style>
 					</Button>

@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Navigation;
+using System.Windows.Threading;
 
 namespace Deno.Views
 {
@@ -40,6 +42,7 @@ namespace Deno.Views
         public HomePage(string username, CurrencyService currencyService)
         {
             InitializeComponent();
+            Loaded += HomePage_Loaded;
             _globalStateService = GlobalStateService.Instance;
             _currencyService = currencyService;
             _username = username;
@@ -48,6 +51,45 @@ namespace Deno.Views
             this.SetValue(WelcomeTextProperty, WelcomeText);
 
             _ = LoadDenominationDataAsync();
+        
+        }
+
+        private void HomePage_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new System.Action(() =>
+            {
+                if (CoinsItemsControl.Items.Count > 0)
+                {
+                    var firstItemContainer = CoinsItemsControl.ItemContainerGenerator.ContainerFromIndex(0) as FrameworkElement;
+                    if (firstItemContainer != null)
+                    {
+                        var textBox = FindVisualChild<TextBox>(firstItemContainer, "CoinQuantityTextBox");
+                        if (textBox != null && textBox.IsEnabled)
+                        {
+                            textBox.Focus();
+                            textBox.SelectAll(); 
+                        }
+                    }
+                }
+            }));
+        }
+
+        private T FindVisualChild<T>(DependencyObject parent, string childName) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T childType && child is FrameworkElement frameworkElement && frameworkElement.Name == childName)
+                {
+                    return childType;
+                }
+                var result = FindVisualChild<T>(child, childName);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
         }
 
         public static readonly DependencyProperty WelcomeTextProperty = DependencyProperty.Register(
@@ -203,7 +245,7 @@ namespace Deno.Views
                     Console.WriteLine($"Updated Note {note.Denomination}: Quantity={note.Quantity}");
                 }
 
-                // Force UI refresh
+               
                 _currencyService.OnPropertyChanged(nameof(CurrencyService.CoinViewModels));
                 _currencyService.OnPropertyChanged(nameof(CurrencyService.NoteViewModels));
                 _currencyService.OnPropertyChanged(nameof(CurrencyService.CoinTotal));

@@ -45,7 +45,6 @@ namespace Deno.Services
                     OnPropertyChanged(nameof(CoinTotal));
                     OnPropertyChanged(nameof(NoteTotal));
                     OnPropertyChanged(nameof(GrandTotal));
-                    Console.WriteLine($"CurrencyService: SelectedCurrency changed to {value?.CurrencyCode}");
                 }
             }
         }
@@ -73,6 +72,31 @@ namespace Deno.Services
             {
                 _updatingRecord = value;
                 OnPropertyChanged(nameof(UpdatingRecord));
+            }
+        }
+
+        public string AllQuantitiesString
+        {
+            get
+            {
+                var sb = new StringBuilder();
+
+                if (CoinViewModels?.Any() == true)
+                {
+                    sb.AppendLine("Coins:");
+                    foreach (var c in CoinViewModels)
+                        sb.AppendLine($"{c.Denomination} × {c.Quantity} = {c.Total}");
+                }
+
+                if (NoteViewModels?.Any() == true)
+                {
+                    sb.AppendLine("Notes:");
+                    foreach (var n in NoteViewModels)
+                        sb.AppendLine($"{n.Denomination} × {n.Quantity} = {n.Total}");
+                }
+
+                sb.AppendLine($"---{Environment.NewLine}Grand Total = {GrandTotal}");
+                return sb.ToString();
             }
         }
 
@@ -171,7 +195,6 @@ namespace Deno.Services
                 }
             };
 
-            // Use GlobalStateService instead of Properties.Settings.Default
             string savedCode = GlobalStateService.Instance.CurrencyCode ?? AllCurrencies.First().CurrencyCode;
             _selectedCurrency = AllCurrencies.FirstOrDefault(c => c.CurrencyCode == savedCode) ?? AllCurrencies.First();
             UpdateViewModels();
@@ -184,7 +207,6 @@ namespace Deno.Services
         }
         private void UpdateViewModels()
         {
-            // Clear existing event subscriptions
             if (CoinViewModels != null)
             {
                 foreach (var coin in CoinViewModels)
@@ -222,6 +244,7 @@ namespace Deno.Services
             {
                 OnPropertyChanged(nameof(NoteTotal));
                 OnPropertyChanged(nameof(GrandTotal));
+                OnPropertyChanged(nameof(AllQuantitiesString));
             }
         }
 
@@ -232,6 +255,7 @@ namespace Deno.Services
             {
                 OnPropertyChanged(nameof(CoinTotal));
                 OnPropertyChanged(nameof(GrandTotal));
+                OnPropertyChanged(nameof(AllQuantitiesString));
             }
         }
 

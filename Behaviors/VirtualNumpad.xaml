@@ -1,11 +1,12 @@
-﻿<UserControl x:Class="Deno.Behaviors.VirtualNumpad" 
-                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl x:Class="Deno.Behaviors.VirtualNumpad"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="400">
+
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
@@ -20,28 +21,94 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <!-- Local Style for Numpad Buttons -->
+        <Grid.Resources>
+            <Style x:Key="NumpadButton" TargetType="Button">
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="Height" Value="80"/>
+                <Setter Property="Margin" Value="1"/>
+                <Setter Property="Padding" Value="12"/>
+                <Setter Property="Background" Value="#f3f4f6"/>
+                <!-- Soft Gray -->
+                <Setter Property="Foreground" Value="#111827"/>
+                <!-- Dark Text -->
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="10"
+                                    Padding="{TemplateBinding Padding}"
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <!-- Hover: lighter -->
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#e5e7eb"/>
+                                </Trigger>
+                                <!-- Pressed: shadow + slight dark -->
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#d1d5db"/>
+                                    <Setter TargetName="border" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect BlurRadius="15" ShadowDepth="2" Color="#888" Opacity="0.4"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Special Buttons (soft colors too) -->
+            <Style x:Key="DangerNumpadButton" TargetType="Button" BasedOn="{StaticResource NumpadButton}">
+                <Setter Property="Background" Value="#fee2e2"/>
+                <!-- soft red bg -->
+                <Setter Property="Foreground" Value="#991b1b"/>
+                <!-- dark red text -->
+            </Style>
+
+            <Style x:Key="SuccessNumpadButton" TargetType="Button" BasedOn="{StaticResource NumpadButton}">
+                <Setter Property="Background" Value="#d1fae5"/>
+                <!-- soft green bg -->
+                <Setter Property="Foreground" Value="#065f46"/>
+                <!-- dark green text -->
+            </Style>
+
+            <Style x:Key="TabNumpadButton" TargetType="Button" BasedOn="{StaticResource NumpadButton}">
+                <Setter Property="Background" Value="#e0e7ff"/>
+                <!-- soft blue bg -->
+                <Setter Property="Foreground" Value="#1e3a8a"/> 
+                <!-- dark blue text -->
+            </Style>
+        </Grid.Resources>
+
         <!-- Row 1 -->
-        <Button Content="7" Grid.Row="1" Grid.Column="0" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="8" Grid.Row="1" Grid.Column="1" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="9" Grid.Row="1" Grid.Column="2" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="X" Grid.Row="1" Grid.Column="3" Click="ClearButton_Click" Focusable="False" />
+        <Button Content="7" Grid.Row="1" Grid.Column="0" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="8" Grid.Row="1" Grid.Column="1" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="9" Grid.Row="1" Grid.Column="2" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="←" Grid.Row="1" Grid.Column="3" Style="{StaticResource DangerNumpadButton}" Click="ClearButton_Click" Focusable="False"/>
 
         <!-- Row 2 -->
-        <Button Content="4" Grid.Row="2" Grid.Column="0" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="5" Grid.Row="2" Grid.Column="1" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="6" Grid.Row="2" Grid.Column="2" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="CC" Grid.Row="2" Grid.Column="3" Click="ClearAllButton_Click" Focusable="False" />
+        <Button Content="4" Grid.Row="2" Grid.Column="0" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="5" Grid.Row="2" Grid.Column="1" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="6" Grid.Row="2" Grid.Column="2" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="×" Grid.Row="2" Grid.Column="3" Style="{StaticResource DangerNumpadButton}" Click="ClearAllButton_Click" Focusable="False"/>
 
         <!-- Row 3 -->
-        <Button Content="1" Grid.Row="3" Grid.Column="0" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="2" Grid.Row="3" Grid.Column="1" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="3" Grid.Row="3" Grid.Column="2" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="Tab" Grid.Row="3" Grid.Column="3" Click="TabButton_Click" Focusable="False" />
+        <Button Content="1" Grid.Row="3" Grid.Column="0" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="2" Grid.Row="3" Grid.Column="1" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="3" Grid.Row="3" Grid.Column="2" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="⇄" Grid.Row="3" Grid.Column="3" Style="{StaticResource TabNumpadButton}" Click="TabButton_Click" Focusable="False"/>
 
         <!-- Row 4 -->
-        <Button Content="0" Grid.Row="4" Grid.Column="0" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="00" Grid.Row="4" Grid.Column="1" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="." Grid.Row="4" Grid.Column="2" Click="NumberButton_Click" Focusable="False" />
-        <Button Content="Enter" Grid.Row="4" Grid.Column="3" Click="EnterButton_Click" Focusable="False" />
+        <Button Content="0" Grid.Row="4" Grid.Column="0" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="00" Grid.Row="4" Grid.Column="1" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="." Grid.Row="4" Grid.Column="2" Style="{StaticResource NumpadButton}" Click="NumberButton_Click" Focusable="False"/>
+        <Button Content="↲" Grid.Row="4" Grid.Column="3" Style="{StaticResource SuccessNumpadButton}" Click="EnterButton_Click" Focusable="False"/>
     </Grid>
 </UserControl>

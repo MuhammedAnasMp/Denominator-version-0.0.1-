@@ -64,7 +64,6 @@ namespace Deno.Behaviors
             var focusedElement = Keyboard.FocusedElement;
             if (focusedElement == null)
             {
-                // Fallback to the main window's focused element
                 var mainWindow = Application.Current.MainWindow;
                 focusedElement = FocusManager.GetFocusedElement(mainWindow);
             }
