@@ -26,6 +26,7 @@ namespace Deno.Views
         public HomeWindow(string username, string auth)
         {
             InitializeComponent();
+            this.Height = System.Windows.SystemParameters.PrimaryScreenHeight * 0.585;
             _auth = auth;
             var currencyService = new CurrencyService();
 
