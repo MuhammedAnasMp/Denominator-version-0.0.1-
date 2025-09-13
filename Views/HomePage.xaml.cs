@@ -1,6 +1,7 @@
 ﻿using Deno.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -99,7 +100,10 @@ namespace Deno.Views
 
         public ICommand LogoutCommand => new RelayCommand(ExecuteLogout);
 
-            
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         private async Task LoadDenominationDataAsync()
         {
             try
@@ -111,7 +115,7 @@ namespace Deno.Views
                     var userId = _globalStateService.UserId;
                     var locCode = _globalStateService.LocCode;
                     var response = await client.GetAsync($"http://{host}/existing_history?Id=0&LocCode={locCode}&UserId={userId}");
-
+                   
                     if (response.IsSuccessStatusCode)
                     {
                         var responseContent = await response.Content.ReadAsStringAsync();
@@ -129,7 +133,7 @@ namespace Deno.Views
                                 UpdateQuantitiesFromApi(data);
                                 _currencyService.UpdatingRecord = true;
                                 _currencyService.EditMod = true;
-
+                                _currencyService.InitialAmount = data.OpeningAmount;
 
                                 _currencyService.UpdatingRecordId = result.Id;
                                 WelcomeText = $"You can update your record.";

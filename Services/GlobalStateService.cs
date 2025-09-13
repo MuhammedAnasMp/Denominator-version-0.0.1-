@@ -144,7 +144,7 @@ namespace Deno.Services
                     LocCode = settings.LocCode ?? "";
                     PosNumber = settings.PosNumber ?? "";
                     PrinterName = settings.PrinterName ?? "";
-                    DomainName = settings.DomainName ?? "";
+                    DomainName = settings.DomainName ?? "172.16.4.253:8000";
                     CurrencyCode = settings.CurrencyCode ?? "AED";
                     IsLoggedIn = settings.IsLoggedIn;
                     Username = settings.Username ?? "";
@@ -152,16 +152,14 @@ namespace Deno.Services
                     Auth = settings.Auth ?? "";
                     DeveIp = settings.DevIp ?? "";
 
-                    Console.WriteLine($"Settings loaded: LocCode={LocCode}, PosNumber={PosNumber}, DomainName={DomainName}, CurrencyCode={CurrencyCode}, IsLoggedIn={IsLoggedIn}, Username={Username}, UserId={UserId}, Auth={Auth}");
                 }
                 else
                 {
-                    Console.WriteLine("No settings file found, using defaults.");
                     LocCode = "";
                     LocName = "";
                     PrinterName = "";
                     PosNumber = "";
-                    DomainName = "";
+                    DomainName = "172.16.4.253:8000";
                     CurrencyCode = "KWD";
                     IsLoggedIn = false;
                     Username = "";
@@ -177,7 +175,7 @@ namespace Deno.Services
                 LocCode = "";
                 LocName = "";
                 PosNumber = "";
-                DomainName = "";
+                DomainName = "172.16.4.253:8000";
                 CurrencyCode = "AED";
                 IsLoggedIn = false;
                 Username = "";

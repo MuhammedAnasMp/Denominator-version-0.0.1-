@@ -100,6 +100,20 @@ namespace Deno.Services
             }
         }
 
+        private decimal _initialAmount;
+
+        public decimal InitialAmount
+        {
+            get => _initialAmount;
+            set
+            {
+                if (_initialAmount != value)
+                {
+                    _initialAmount = value;
+                    OnPropertyChanged(nameof(InitialAmount));
+                }
+            }
+        }
 
 
         private bool _editMod;
@@ -347,8 +361,6 @@ namespace Deno.Services
                                             }}
                                             .header {{
                                                 text-align: center;
-                                                margin-bottom: 15px;
-                                                padding-bottom: 10px;
                                                 border-bottom: 1px solid #007bff;
                                             }}
                                             .store-name {{
@@ -434,18 +446,17 @@ namespace Deno.Services
                                     <div class='receipt-container'>
                                         <div class='header'>
                                             <h1 class='store-name'>{StoreName}</h1>
-                                            <div class='info-row'>
-                                                <span class='info-item'>Date: <strong>{data.CreatedDt:dd-MMM-yy}</strong></span>
+                                                      <span class='info-item'>Date: <strong>{data.CreatedDt:dd-MMM-yy}</strong></span>
                                                 <span class='info-item'>ID: <strong>{data.CreatedById}</strong></span>
                                                 <br/>
                                                 <span class='info-item'>Name: <strong>{data.CreatedByName}</strong></span><br/>
-                                                <p>First Bill: {FormatDateWithAmPm(data.FirstBill)}</p><br/>
-                                               <p>Last Bill: {FormatDateWithAmPm(data.LastBill)}</p> <br/>
-                                               <p> Revision Count : {data.UpdatedCount}
-                                            </div>
                                         </div>
                                         <div>
-                                        <h3>Currency Denominations</h3>
+ <div style='text-align:center;'>
+     <strong>Opening Till Amount : <span class='currency-symbol'>{data.OpeningAmount} KD</span></strong>
+ </div>
+                                              <h3>Currency Denominations</h3>
+
                                         <table>
                        
 
@@ -466,7 +477,7 @@ namespace Deno.Services
                                            <div/>
                                             <div class='total-row'>
                                                 <div colspan='3' style='text-align:center;'>
-                                                    <strong>Total Currency: <span class='currency-symbol'>{FormatAmount(data.NoteTotal)}</span></strong>
+                                                    <strong>Total Currency: <span class='currency-symbol'>{FormatAmount(data.NoteTotal)} KD</span></strong>
                                                 </div>
                                             </div>
                                         <div>
@@ -486,15 +497,16 @@ namespace Deno.Services
                                         </div>
                                             <div class='total-row'>
                                                 <div style='text-align:center;'>
-                                                    <strong>Total Coins: <span class='currency-symbol'>{FormatAmount(data.CoinTotal)}</span></strong>
+                                                    <strong>Total Coins: <span class='currency-symbol'>{FormatAmount(data.CoinTotal)} KD</span></strong>
                                                 </div>
                                             </div>
 
 
-                                      <div class='footer'>
-                                            <p><span class='grand-total'> Grand Total : {data.GrandTotal} KD </span> </p> <br/>  <br/>
+                                              <div class='footer'>
+                                            
+                                                  <p><span class='grand-total'> Grand Total : {data.GrandTotal} KD </span> </p>
                                          
-                                        </div>
+                                          </div>
                                         <div>
 
                                         <h3>Supervisor Bill Summary</h3>
@@ -529,6 +541,7 @@ namespace Deno.Services
                                                   </table>
                                             <div/>
 
+                                                
                                             <table style=""width: 100%; font-size: 12px;"">
                                             <tr>
                                                 <td style=""text-align: left;"">
@@ -541,8 +554,21 @@ namespace Deno.Services
                                                 </td>
                                             </tr>
                                         </table>
+
                                             
                                             <div class='footer'>
+                                            <div class='info-row'>
+                                                <p><strong>Login Time :</strong> {data.LoginTime}</p><br/>
+                                                <p><strong>First Bill:</strong> {FormatDateWithAmPm(data.FirstBill)}</p><br/>
+                                                <p><strong>Last Bill:</strong> {FormatDateWithAmPm(data.LastBill)}</p><br/>
+                                                <p><strong>Declare Time :</strong> {FormatDateWithAmPm(data.DeclareTime)}</p><br/>
+                                                <p><strong>Hours Spend In Counter :</strong> {data.HoursSpendInPos}</p><br/>
+                                                <p><strong>Total Served Customers :</strong> {data.TotalCustomer}</p><br/>
+                                                <p><strong>Revision Count :</strong> {data.UpdatedCount}</p><br/>
+                                                <hr/>
+                                            </div>
+
+
                                                <p>Generated on: {DateTime.Now:dd-MMM-yyyy HH:mm}</p> 
                                               
                                                 </div>
@@ -842,10 +868,24 @@ namespace Deno.Services
                         DevIp = GlobalStateService.Instance.DeveIp,
 
                         UpdatingRecordId = updatingRecordId.HasValue ? updatingRecordId.Value : (int?)null,
-                        AuthorizedBy = authorizedBy.HasValue ? authorizedBy.Value : (int?)null
+                        AuthorizedBy = authorizedBy.HasValue ? authorizedBy.Value : (int?)null,
+
+
+                        OpeningAmount = InitialAmount
                 
                     };
-                      
+
+
+                    if (InitialAmount == 0)
+                    {
+                        MessageBox.Show("Enter the opening till amount .",
+                                        "Amount Required",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Warning);
+                        return null;
+                    }
+
+
                     if (GrandTotal == 0)
                     {
                         MessageBox.Show("Please enter the quantity for each coin and note.",
@@ -1011,10 +1051,30 @@ namespace Deno.Services
             [JsonPropertyName("last_bill")]
             public string LastBill { get; set; }
 
-            [JsonPropertyName("reprint_count")]
 
+            [JsonPropertyName("reprint_count")]
             public int UpdatedCount { get; set; }
 
+//new data here
+
+            [JsonPropertyName("hours_spent_in_pos")]
+            public string HoursSpendInPos { get; set; }
+
+
+            [JsonPropertyName("total_customer")]
+            public int TotalCustomer { get; set; }
+
+
+            [JsonPropertyName("login")]
+            public string LoginTime { get; set; }
+
+            [JsonPropertyName("declare")]
+            public string DeclareTime { get; set; }
+
+
+
+            [JsonPropertyName("opening_amount")]
+            public int OpeningAmount { get; set; }
         }
 
 

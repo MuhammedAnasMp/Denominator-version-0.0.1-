@@ -215,62 +215,123 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <ItemsControl x:Name="CoinsItemsControl" ItemsSource="{Binding CoinViewModels}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#f8fafc"
-                            CornerRadius="1"
-                            Padding="8"
-                            Margin="0,0,0,4">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="60"/>
-                                                    <ColumnDefinition Width="2*"/>
-                                                    <ColumnDefinition Width="140"/>
-                                                </Grid.ColumnDefinitions>
+                            <StackPanel>
 
-                                                <Border Background="#e0e7ff" CornerRadius="6" Padding="6,3">
-                                                    <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12"
-                                           FontWeight="SemiBold"
-                                           Foreground="#3730a3"/>
-                                                </Border>
+                                <!-- Initial Amount Row -->
+                                <Border Background="#f8fafc"
+								CornerRadius="1"
+								Padding="8"
+								Margin="0,0,0,4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="2*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                                <TextBox x:Name="CoinQuantityTextBox"
-                                     Grid.Column="1"
-                                     Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
-                                     Margin="8,0"
-                                     GotFocus="TextBox_GotFocus">
-                                                    <TextBox.Style>
-                                                        <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
-                                                            <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
-                                                            <Setter Property="IsEnabled" Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
-                                                            <Style.Triggers>
-                                                                <Trigger Property="IsEnabled" Value="False">
-                                                                    <Setter Property="Background" Value="#e5e7eb"/>
-                                                                    <Setter Property="Foreground" Value="#6b7280"/>
-                                                                </Trigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBox.Style>
-                                                </TextBox>
-
-                                                <Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="6,3">
-                                                    <TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"
-                                           FontWeight="Bold"
-                                           FontSize="14"
-                                           Foreground="#166534"/>
-                                                </Border>
-                                            </Grid>
+                                        <!-- Label -->
+                                        <Border Background="#e0e7ff" CornerRadius="6" Padding="6,3">
+                                            <TextBlock Text="Opn Amt"
+								   VerticalAlignment="Center"
+								   HorizontalAlignment="Center"
+								   FontSize="12"
+								   FontWeight="SemiBold"
+								   Foreground="#3730a3"/>
                                         </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                                <!-- 
+
+                                        <!-- Input for Initial Amount -->
+                                        <TextBox Grid.Column="1"
+						 Margin="8,0"
+						 Text="{Binding InitialAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+                                                    <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                                    <Setter Property="IsEnabled" 
+									Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                                                    <!-- Red border -->
+                                                    <Setter Property="BorderBrush" Value="#FF5600"/>
+                                                    <Setter Property="BorderThickness" Value="1"/>
+
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsEnabled" Value="False">
+                                                            <Setter Property="Background" Value="#e5e7eb"/>
+                                                            <Setter Property="Foreground" Value="#6b7280"/>
+                                                            <Setter Property="BorderBrush" Value="#FF5600"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+                                        </TextBox>
+
+
+
+                                    </Grid>
+                                </Border>
+
+                                <!-- Coins List -->
+                                <ItemsControl x:Name="CoinsItemsControl" 
+                  ItemsSource="{Binding CoinViewModels}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#f8fafc"
+                        CornerRadius="1"
+                        Padding="8"
+                        Margin="0,0,0,4">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="60"/>
+                                                        <ColumnDefinition Width="2*"/>
+                                                        <ColumnDefinition Width="140"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Denomination -->
+                                                    <Border Background="#e0e7ff" CornerRadius="6" Padding="6,3">
+                                                        <TextBlock Text="{Binding Denomination, StringFormat='{}{0:F3}'}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="#3730a3"/>
+                                                    </Border>
+
+                                                    <!-- Quantity input -->
+                                                    <TextBox x:Name="CoinQuantityTextBox"
+                                 Grid.Column="1"
+                                 Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="8,0"
+                                 GotFocus="TextBox_GotFocus">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+                                                                <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                                                <Setter Property="IsEnabled" Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="IsEnabled" Value="False">
+                                                                        <Setter Property="Background" Value="#e5e7eb"/>
+                                                                        <Setter Property="Foreground" Value="#6b7280"/>
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+
+                                                    <!-- Total -->
+                                                    <Border Grid.Column="2" Background="#dcfce7" CornerRadius="6" Padding="6,3">
+                                                        <TextBlock Text="{Binding Total, StringFormat='{}{0}'}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontWeight="Bold"
+                                       FontSize="14"
+                                       Foreground="#166534"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                              
+                            </StackPanel>
+
+                            <!-- 
                             <TextBox 
                                 Text="{Binding AllQuantitiesString, Mode=OneWay}" 
 					FontSize="14"
