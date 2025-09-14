@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Deno.Views"
         mc:Ignorable="d"
-        Title="Login" Height="320" Width="360"
+        Title="Cashier Login" Height="320" Width="360"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
@@ -105,7 +105,7 @@
 
 				<!-- Username -->
 				<StackPanel Grid.Row="1">
-					<TextBlock Text="Login Id " FontSize="12" Foreground="#6B7280" Margin="0,0,0,4"/>
+					<TextBlock Text="Cashier Id " FontSize="12" Foreground="#6B7280" Margin="0,0,0,4"/>
 					<TextBox x:Name="UsernameBox" KeyDown="UsernameBox_KeyDown"/>
 				</StackPanel>
 

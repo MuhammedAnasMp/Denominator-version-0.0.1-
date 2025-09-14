@@ -136,7 +136,7 @@ namespace Deno.Views
                                 _currencyService.InitialAmount = data.OpeningAmount;
 
                                 _currencyService.UpdatingRecordId = result.Id;
-                                WelcomeText = $"You can update your record.";
+                                WelcomeText = $"Wellcome {_globalStateService.Username} : You can update your record.";
                                 IsLoading = false;
                                 //MessageBox.Show($"Manager ID is required to update existing records. {result.Id}", "Update Required", MessageBoxButton.OK, MessageBoxImage.Information);
                             }

@@ -76,11 +76,41 @@ namespace Deno.Views
         {
             if (_isLoggingIn) return;
             _isLoggingIn = true;
-
+            var username = UsernameBox.Text;
+            var password = PasswordBox.Password;
             try
             {
-                var username = UsernameBox.Text;
-                var password = PasswordBox.Password;
+                var instance = GlobalStateService.Instance;
+
+
+                if (username != "con" && password != "con")
+                {
+                    if (!(!string.IsNullOrEmpty(instance.LocCode) &&
+                    !string.IsNullOrEmpty(instance.PosNumber) &&
+                    !string.IsNullOrEmpty(instance.DomainName) &&
+                    !string.IsNullOrEmpty(instance.DeveIp) &&
+                    !string.IsNullOrEmpty(instance.LocName)) )  
+           
+                    {
+                        string message = "⚠️ Some values are missing:\n";
+
+                        if (string.IsNullOrEmpty(instance.LocCode)) message += "- LocCode is empty\n";
+                        if (string.IsNullOrEmpty(instance.PosNumber)) message += "- PosNumber is empty\n";
+                        if (string.IsNullOrEmpty(instance.DomainName)) message += "- DomainName is empty\n";
+                        if (string.IsNullOrEmpty(instance.DeveIp)) message += "- DeveIp is empty\n";
+                        if (string.IsNullOrEmpty(instance.LocName)) message += "- LocName is empty\n";
+
+                        System.Windows.MessageBox.Show(message,
+                                        "Error",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Error);
+
+                        return;
+                    }
+
+                }
+
+               
 
                 var loginSuccess = await Authenticate(username, password);
 

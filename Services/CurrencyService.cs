@@ -204,8 +204,9 @@ namespace Deno.Services
                     CurrencySymbol = "د.ك",
                     SubunitName = "Fils",
                     SubunitPerUnit = 1000,
-                    Coins = new List<decimal> { 0.005m, 0.01m, 0.02m, 0.05m, 0.1m },
-                    Notes = new List<decimal> { 0.25m, 0.5m, 1, 5, 10, 20 }
+                    Coins = new List<decimal> { 0.1m, 0.05m, 0.02m, 0.01m, 0.005m },
+                    Notes = new List<decimal> { 20m, 10m, 5m, 1m, 0.5m, 0.25m }
+
                 }
             };
 
@@ -278,7 +279,11 @@ namespace Deno.Services
         {
             if (EditMod)
             {
-                //MessageBox.Show("Unlock is required");
+                MessageBox.Show("You must unlock first to reset values.",
+                "Access Required",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
                 return;
             }
             foreach (var coin in CoinViewModels)
@@ -306,7 +311,7 @@ namespace Deno.Services
                 return apiDate;
             }
         }
-        private async void PrintReceipt(int createdId ,bool reset = true)
+        private async void PrintReceipt(int createdId ,bool reset = false)
         {
             try
             {
@@ -617,7 +622,6 @@ namespace Deno.Services
                                 //validate this 
                                 if (reset)
                                 {
-
                                 Reset(null);
                                 }
                                

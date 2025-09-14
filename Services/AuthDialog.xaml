@@ -98,12 +98,12 @@
 
         <!-- Title -->
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" 
-                   Text="Authorization Required" 
-                   Margin="0,0,0,12" FontWeight="Bold"
+                
+                   Margin="0,0,0,0" FontWeight="Bold"
                    HorizontalAlignment="Center" FontSize="16"/>
 
         <!-- ID (hidden) -->
-        <Label Grid.Row="1" Grid.Column="0" Content="ID:" VerticalAlignment="Center"/>
+        <Label Grid.Row="1" Grid.Column="0" Content="Void ID:" VerticalAlignment="Center"/>
         <PasswordBox x:Name="IdBox"   Grid.Row="1" Grid.Column="1" 
              Style="{StaticResource ModernPasswordBox}" 
              Width="200"
