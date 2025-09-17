@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using Deno.Services;
+using System;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
 
 namespace Deno.Views
 {
@@ -20,6 +9,23 @@ namespace Deno.Views
         public ManagePage()
         {
             InitializeComponent();
+            InitializeWebView();
+        }
+
+        private async void InitializeWebView()
+        {
+            try
+            {
+                // Ensure WebView2 is ready
+                await MyWebView.EnsureCoreWebView2Async();
+                string url = GlobalStateService.Instance.DomainName;
+       
+                MyWebView.Source = new Uri($"http://{url}");
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("WebView2 failed: " + ex.Message);
+            }
         }
     }
 }
