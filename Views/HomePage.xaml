@@ -175,7 +175,7 @@
 			</Grid.RowDefinitions>
 
 			<!-- HEADER -->
-			<Border Grid.Row="0" Background="White" Padding="8,4" CornerRadius="0" Margin="0">
+			<Border Grid.Row="0" Background="White" Padding="0,0" CornerRadius="0" Margin="0">
 				<DockPanel LastChildFill="False">
 					<StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
 						<Ellipse Width="8" Height="8" Fill="#10b981" Margin="0,0,6,0"/>
@@ -183,7 +183,8 @@
                                    FontSize="18"
                                    FontWeight="Bold"
                                    Foreground="#1f2937"
-                                   VerticalAlignment="Center"/>
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
 					</StackPanel>
 
 					<Button Content="Logout"
@@ -220,7 +221,7 @@
                             <ItemsControl ItemsSource="{Binding NoteViewModels}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="#f8fafc" CornerRadius="1" Padding="8" Margin="0,0,0,4">
+                                        <Border Background="#f8fafc" CornerRadius="1" Padding="4" Margin="0,0,0,4">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="60"/>
@@ -301,7 +302,7 @@
                                         <DataTemplate>
                                             <Border Background="#f8fafc"
 												CornerRadius="1"
-												Padding="8"
+												Padding="4"
 												Margin="0,0,0,4">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>

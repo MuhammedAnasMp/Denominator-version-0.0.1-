@@ -18,6 +18,7 @@ namespace Deno.Views
     public partial class ConfigPage : UserControl
     {
         private string localIP;
+        private string printerName;
 
         public ConfigPage()
         {
@@ -49,6 +50,7 @@ namespace Deno.Views
             if (CurrencyPicker.SelectedItem != null)
             {
                 GlobalStateService.Instance.CurrencyCode = CurrencyPicker.SelectedItem.ToString();
+
                 Console.WriteLine($"CurrencyPicker changed: CurrencyCode={GlobalStateService.Instance.CurrencyCode}");
             }
         }
@@ -102,40 +104,52 @@ namespace Deno.Views
         }
 
 
-    
+
+
+        private void PrinterComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Populate ComboBox with installed printers
+            PrinterComboBox.Items.Clear();
+            foreach (string printer in PrinterSettings.InstalledPrinters)
+            {
+                //if (printer.IndexOf("Microsoft", StringComparison.OrdinalIgnoreCase) >= 0) continue;
+                //if (printer.IndexOf("OneNote", StringComparison.OrdinalIgnoreCase) >= 0) continue;
+                //if (printer.IndexOf("XPS", StringComparison.OrdinalIgnoreCase) >= 0) continue;
+                //if (printer.IndexOf("Fax", StringComparison.OrdinalIgnoreCase) >= 0) continue;
+                //if (printer.IndexOf("PDF", StringComparison.OrdinalIgnoreCase) >= 0) continue;
+                //if (printer.IndexOf("P o s", StringComparison.OrdinalIgnoreCase) >= 0) continue;
+                PrinterComboBox.Items.Add(printer);
+            }
+
+            // Try to select saved printer from GlobalStateService
+            string savedPrinter = GlobalStateService.Instance.PrinterName;
+
+            if (!string.IsNullOrWhiteSpace(savedPrinter) && PrinterComboBox.Items.Contains(savedPrinter))
+            {
+                PrinterComboBox.SelectedItem = savedPrinter;
+            }
+            else if (PrinterComboBox.Items.Count > 0)
+            {
+                // Fallback: select first available printer
+                MessageBox.Show(savedPrinter, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                PrinterComboBox.SelectedIndex = 0;
+                GlobalStateService.Instance.PrinterName = PrinterComboBox.SelectedItem.ToString();
+                GlobalStateService.Instance.SaveSettings();
+            }
+        }
 
         private void OnTestPrinterClicked(object sender, RoutedEventArgs e)
         {
-            // Get the printer name from the PrinterNameTextBox
-            string printerName = PrinterNameTextBox.Text;
-            
-
-            if (string.IsNullOrWhiteSpace(printerName))
+            string printerName = PrinterComboBox.SelectedItem as string;
+            PrinterComboBox.IsDropDownOpen = false;
+            if (string.IsNullOrWhiteSpace(printerName) || printerName.Length == 0)
             {
-                MessageBox.Show("Please enter a valid printer name.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Please select a valid printer.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             try
             {
-                // Validate if the printer is available
-                bool isPrinterValid = false;
-                foreach (string installedPrinter in PrinterSettings.InstalledPrinters)
-                {
-                    if (installedPrinter.Equals(printerName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        isPrinterValid = true;
-                        break;
-                    }
-                }
-
-                if (!isPrinterValid)
-                {
-                    MessageBox.Show($"Printer '{printerName}' is not installed or available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                // Get current date in a suitable format (e.g., "MM/dd/yyyy HH:mm:ss")
                 string currentDate = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
 
                 // Prepare HTML content with dynamic printer name and date
@@ -187,26 +201,40 @@ namespace Deno.Views
                 var printerService = new PrinterService();
                 AsyncPrintTask.Exec(
                     true,
-                    () => printerService.DoPrint(htmlContent, PrinterNameTextBox.Text, 46)
+                    () => printerService.DoPrint(htmlContent, printerName, 46)
                 );
-                MessageBox.Show($"Printer test for '{PrinterNameTextBox.Text}' initiated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Printer test for '{printerName}' initiated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Check if the printer name is in the correct format and uses capital letters appropriately.\r\n ", $"Error {ex}", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error printing demo page: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-       
-
         }
         private void OnSaveClicked(object sender, RoutedEventArgs e)
         {
             try
             {
-              
+                if (string.IsNullOrWhiteSpace(printerName))
+
+
+                {
+
+                    if (PrinterComboBox.Items.Count == 0)
+                    {
+                        MessageBox.Show("Not found any installed printers . Please contact admin ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        GlobalStateService.Instance.PrinterName = "";
+                    return;
+                    }
+
+                   
+                }
+
                 GlobalStateService.Instance.SaveSettings();
 
                 if (GlobalStateService.Instance.Auth == "configuration")
                 {
+
+                    GlobalStateService.Instance.PrinterName = PrinterComboBox.SelectedItem as string; 
                     GlobalStateService.Instance.IsLoggedIn = false;
                     GlobalStateService.Instance.Username = "";
                     GlobalStateService.Instance.UserId = "";
@@ -221,13 +249,14 @@ namespace Deno.Views
                 }
                 else
                 {
-                    MessageBox.Show("Configuration saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                    GlobalStateService.Instance.PrinterName = PrinterComboBox.SelectedItem as string;
                     GlobalStateService.Instance.IsLoggedIn = false;
                     GlobalStateService.Instance.Username = "";
                     GlobalStateService.Instance.UserId = "";
                     GlobalStateService.Instance.Auth = "";
                     GlobalStateService.Instance.DeveIp = localIP;
                     GlobalStateService.Instance.SaveSettings();
+                    MessageBox.Show("Configuration saved successfully!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
                     LoginWindow login = new LoginWindow();
                     login.Show();
                     Window.GetWindow(this)?.Close();

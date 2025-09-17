@@ -14,13 +14,14 @@ namespace Deno.Services
         private string _posNumber = "";
         private string _printerName = "";
         private string _domainName = "";
-        private string _currencyCode = "AED";
+        private string _currencyCode = "KWD";
         private bool _isLoggedIn;
         private string _username = "";
         private string _userId = "";
         private string _auth = "";
         private string _locName = "";
         private string _deveIp = "";
+        private string _openingAmount = "";
 
         public string DeveIp
         {
@@ -38,6 +39,12 @@ namespace Deno.Services
         {
             get => _locCode;
             set { _locCode = value ?? ""; OnPropertyChanged(nameof(LocCode)); }
+        }
+
+        public string OpeningAmount
+        {
+            get => _openingAmount;
+            set { _openingAmount = value ?? ""; OnPropertyChanged(nameof(LocCode)); }
         }
         public string PrinterName
         {
@@ -115,7 +122,8 @@ namespace Deno.Services
                     Username = Username,
                     UserId = UserId,
                     Auth = Auth ,
-                    DevIp = DeveIp
+                    DevIp = DeveIp,
+                    OpeningAmount = OpeningAmount  
                 };
 
                 Directory.CreateDirectory(Path.GetDirectoryName(SettingsFilePath));
@@ -151,6 +159,8 @@ namespace Deno.Services
                     UserId = settings.UserId ?? "";
                     Auth = settings.Auth ?? "";
                     DeveIp = settings.DevIp ?? "";
+                    OpeningAmount = settings.OpeningAmount ?? "110";
+
 
                 }
                 else
@@ -166,6 +176,7 @@ namespace Deno.Services
                     UserId = "";
                     Auth = "";
                     DeveIp = "";
+                    OpeningAmount = "110";
 
                 }
             }
@@ -176,11 +187,12 @@ namespace Deno.Services
                 LocName = "";
                 PosNumber = "";
                 DomainName = "172.16.4.253:8000";
-                CurrencyCode = "AED";
+                CurrencyCode = "KWD";
                 IsLoggedIn = false;
                 Username = "";
                 UserId = "";
                 Auth = "";
+                OpeningAmount = "110";
                 throw; // Re-throw to let caller handle
             }
         }
@@ -199,5 +211,6 @@ namespace Deno.Services
         public string UserId { get; set; }
         public string Auth { get; set; }
         public string PrinterName { get; set; }
+        public string OpeningAmount { get; set; }
     }
 }

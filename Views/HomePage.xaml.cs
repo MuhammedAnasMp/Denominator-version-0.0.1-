@@ -47,6 +47,9 @@ namespace Deno.Views
             _globalStateService = GlobalStateService.Instance;
             _currencyService = currencyService;
             _username = username;
+
+            _currencyService.InitialAmount = decimal.TryParse(GlobalStateService.Instance.OpeningAmount, out var openingAmount) ? openingAmount : 0m;
+           
             WelcomeText = $"Welcome, {username}!";
             DataContext = _currencyService;
             this.SetValue(WelcomeTextProperty, WelcomeText);
@@ -134,6 +137,7 @@ namespace Deno.Views
                                 _currencyService.UpdatingRecord = true;
                                 _currencyService.EditMod = true;
                                 _currencyService.InitialAmount = data.OpeningAmount;
+                                
 
                                 _currencyService.UpdatingRecordId = result.Id;
                                 WelcomeText = $"Wellcome {_globalStateService.Username} : You can update your record.";

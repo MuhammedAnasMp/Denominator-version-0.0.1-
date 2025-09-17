@@ -5,140 +5,223 @@
              xmlns:local="clr-namespace:Deno.Behaviors"
              Width="780" Height="600">
 
-	<UserControl.Resources>
-		<!-- Modern TextBox Style -->
-		<Style x:Key="ModernTextBox" TargetType="TextBox">
-			<Setter Property="Height" Value="36"/>
-			<Setter Property="Padding" Value="8,4"/>
-			<Setter Property="BorderBrush" Value="#d1d5db"/>
-			<Setter Property="BorderThickness" Value="1"/>
-			<Setter Property="Background" Value="White"/>
-			<Setter Property="Foreground" Value="Black"/>
-			<Setter Property="CaretBrush" Value="Black"/>
-			<Setter Property="FontSize" Value="14"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="TextBox">
-						<Border Background="{TemplateBinding Background}"
+    <UserControl.Resources>
+        <!-- Modern TextBox Style -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="BorderBrush" Value="#d1d5db"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="CaretBrush" Value="Black"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="6"
                                 Padding="{TemplateBinding Padding}">
-							<ScrollViewer x:Name="PART_ContentHost"/>
-						</Border>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsFocused" Value="True">
-								<Setter Property="BorderBrush" Value="#4f46e5"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#4f46e5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-		<!-- Modern Button Style -->
-		<Style x:Key="ModernButton" TargetType="Button">
-			<Setter Property="Background" Value="#4f46e5"/>
-			<Setter Property="Foreground" Value="White"/>
-			<Setter Property="BorderThickness" Value="0"/>
-			<Setter Property="Padding" Value="16,8"/>
-			<Setter Property="FontSize" Value="14"/>
-			<Setter Property="FontWeight" Value="SemiBold"/>
-			<Setter Property="Cursor" Value="Hand"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="Button">
-						<Border Background="{TemplateBinding Background}"
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#4f46e5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
                                 CornerRadius="6"
                                 Padding="{TemplateBinding Padding}">
-							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						</Border>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsMouseOver" Value="True">
-								<Setter Property="Background" Value="#3730a3"/>
-							</Trigger>
-							<Trigger Property="IsPressed" Value="True">
-								<Setter Property="Background" Value="#312e81"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-	</UserControl.Resources>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3730a3"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#312e81"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-	<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0" MinHeight="600">
-		<StackPanel Margin="20" Width="400">
-			<TextBlock Text="Currency" FontWeight="Bold" Margin="0,0,0,5"/>
-			<ComboBox x:Name="CurrencyPicker"
+        <!-- ComboBox ToggleButton Template (modern dropdown arrow) -->
+        <ControlTemplate x:Key="ComboBoxToggleButtonTemplate" TargetType="ToggleButton">
+            <Border Background="Transparent" Padding="4">
+                <Grid Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Path x:Name="Arrow" Fill="Black" Data="M 0 0 L 4 4 L 8 0 Z" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Arrow" Property="Fill" Value="#4f46e5"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Modern ComboBox Style -->
+        <Style x:Key="ModernComboBox" TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="BorderBrush" Value="#d1d5db"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6"
+                                    Padding="{TemplateBinding Padding}">
+                                <DockPanel>
+                                    <ContentPresenter Name="ContentSite"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                      Margin="0"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left"/>
+                                    <ToggleButton DockPanel.Dock="Right"
+                                                  IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  Focusable="False"
+                                                  ClickMode="Press"
+                                                  Template="{StaticResource ComboBoxToggleButtonTemplate}"/>
+                                </DockPanel>
+                            </Border>
+                            <Popup Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Border Name="DropDownBorder"
+                                        Background="White"
+                                        BorderBrush="#d1d5db"
+                                        BorderThickness="1"
+                                        CornerRadius="6">
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#4f46e5"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0" MinHeight="600">
+        <StackPanel Margin="20" Width="400">
+
+            <TextBlock Text="Currency" FontWeight="Bold" Margin="0,0,0,5"/>
+            <ComboBox x:Name="CurrencyPicker"
                       Height="36"
                       Margin="0,0,0,10"
-                      SelectionChanged="CurrencyPicker_SelectionChanged"/>
+                      SelectionChanged="CurrencyPicker_SelectionChanged"
+                      Style="{StaticResource ModernComboBox}"/>
 
-			<TextBlock Text="Device IP" FontWeight="Bold" Margin="0,10,0,5"/>
-			<TextBox x:Name="DeviceIpTextBox"
+            <TextBlock Text="Device IP" FontWeight="Bold" Margin="0,10,0,5"/>
+            <TextBox x:Name="DeviceIpTextBox"
                      IsReadOnly="True"
                      Style="{StaticResource ModernTextBox}"/>
-			
-			<TextBlock Text="Location Code" FontWeight="Bold" Margin="0,10,0,5"/>
-			<TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=LocCode, Mode=TwoWay}"
+
+            <TextBlock Text="Location Code" FontWeight="Bold" Margin="0,10,0,5"/>
+            <TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=LocCode, Mode=TwoWay}"
                      Style="{StaticResource ModernTextBox}"/>
 
-			
-
-			<TextBlock Text="Location Name" FontWeight="Bold" Margin="0,10,0,5"/>
-			<TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=LocName, Mode=TwoWay}"
+            <TextBlock Text="Location Name" FontWeight="Bold" Margin="0,10,0,5"/>
+            <TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=LocName, Mode=TwoWay}"
                      Style="{StaticResource ModernTextBox}"/>
 
-			<TextBlock Text="POS Number" FontWeight="Bold" Margin="0,10,0,5"/>
-			<TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=PosNumber, Mode=TwoWay}"
+            <TextBlock Text="POS Number" FontWeight="Bold" Margin="0,10,0,5"/>
+            <TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=PosNumber, Mode=TwoWay}"
                      Style="{StaticResource ModernTextBox}"/>
 
-			<TextBlock Text="Printer Name" FontWeight="Bold" Margin="0,10,0,5"/>
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
-				<TextBox Grid.Column="0"
-                         x:Name="PrinterNameTextBox"
-                         Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=PrinterName, Mode=TwoWay}"
-                         Style="{StaticResource ModernTextBox}"
-                         Margin="0,0,10,0"/>
-				<Button Grid.Column="1"
+            <TextBlock Text="Opening Amount " FontWeight="Bold" Margin="0,10,0,5"/>
+            <TextBox Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=OpeningAmount, Mode=TwoWay}"
+            Style="{StaticResource ModernTextBox}"/>
+
+            <TextBlock Text="Printer Name" FontWeight="Bold" Margin="0,10,0,5"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Grid.Column="0"
+                          x:Name="PrinterComboBox"
+                          Margin="0,0,10,0"
+                          Loaded="PrinterComboBox_Loaded"
+                          SelectedIndex="0"
+                          Style="{StaticResource ModernComboBox}"/>
+
+                <Button Grid.Column="1"
                         Content="Test"
                         Style="{StaticResource ModernButton}"
                         Width="100"
                         Click="OnTestPrinterClicked"/>
-			</Grid>
+            </Grid>
 
-			<TextBlock Text="Domain Name" FontWeight="Bold" Margin="0,10,0,5"/>
-			
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
+            <TextBlock Text="Domain Name" FontWeight="Bold" Margin="0,10,0,5"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-				<TextBox x:Name="DomainNameTextBox" Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=DomainName, Mode=TwoWay}"
-                     Style="{StaticResource ModernTextBox}"
-					 Margin="0,0,10,0"/>
-				<Button Grid.Column="1"
+                <TextBox x:Name="DomainNameTextBox"
+                         Text="{Binding Source={x:Static services:GlobalStateService.Instance}, Path=DomainName, Mode=TwoWay}"
+                         Style="{StaticResource ModernTextBox}"
+                         Margin="0,0,10,0"/>
+                <Button Grid.Column="1"
                         Content="Check"
                         Style="{StaticResource ModernButton}"
                         Width="100"
                         Click="OnTestDomainClicked"/>
-				
-			</Grid>
-			
+            </Grid>
 
-			<TextBlock Text="" FontWeight="Bold" Margin="0,10,0,5"/>
-			<Button Content="Save"
+            <Button Content="Save"
                     Style="{StaticResource ModernButton}"
                     Width="286"
+                    Margin="0,20,0,0"
                     Click="OnSaveClicked"/>
 
-			<TextBlock Height="300"/>
-		</StackPanel>
-	</ScrollViewer>
+            <TextBlock Height="300"/>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

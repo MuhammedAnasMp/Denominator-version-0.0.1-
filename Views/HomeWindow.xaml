@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Denomination"
         WindowStyle="None"
-        ResizeMode="NoResize"
-        Width="{Binding Source={x:Static SystemParameters.PrimaryScreenWidth}}"
+      
+        Width="20"
         Height="540"
         Top="0"
         Left="0">
