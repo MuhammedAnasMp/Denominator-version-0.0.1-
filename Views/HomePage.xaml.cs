@@ -58,6 +58,19 @@ namespace Deno.Views
         
         }
 
+
+        private void OpenPopup_Click(object sender, RoutedEventArgs e)
+        {
+            var issueWindow = new Deno.Services.IssueWindow
+            {
+                Owner = Window.GetWindow(this) // set parent for centering and modal behavior
+            };
+
+            issueWindow.ShowDialog(); // modal
+        }
+
+
+
         private void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new System.Action(() =>

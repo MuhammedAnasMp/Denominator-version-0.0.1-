@@ -175,27 +175,37 @@
 			</Grid.RowDefinitions>
 
 			<!-- HEADER -->
-			<Border Grid.Row="0" Background="White" Padding="0,0" CornerRadius="0" Margin="0">
-				<DockPanel LastChildFill="False">
-					<StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-						<Ellipse Width="8" Height="8" Fill="#10b981" Margin="0,0,6,0"/>
-						<TextBlock Text="{Binding WelcomeText, ElementName=HomePageRoot}"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="#1f2937"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"/>
-					</StackPanel>
-
-					<Button Content="Logout"
-                            Command="{Binding LogoutCommand, ElementName=HomePageRoot}"
-                            Style="{StaticResource DangerButton}"
-                            DockPanel.Dock="Right"
-                            Padding="12,6"/>
-				</DockPanel>
-			</Border>
-
-			<!-- MAIN CONTENT -->
+            <Border Grid.Row="0" Background="White" Padding="0" CornerRadius="0" Margin="0">
+                <DockPanel LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Ellipse Width="8" Height="8" Fill="#10b981" Margin="0,0,6,0"/>
+                        <TextBlock Text="{Binding WelcomeText, ElementName=HomePageRoot}"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="#1f2937"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Margin="0">
+                        <!-- Help Us Button -->
+                        <Button Content="Help 📩" 
+                    Height="40" 
+                    Style="{StaticResource SuccessButton}"
+                    Padding="12,6"
+                    Margin="0,0,8,0" Click="OpenPopup_Click"/>
+                        <!-- 8-pixel gap to the right -->
+                        <!-- Logout Button (last, furthest to the right) -->
+                        <Button Content="Logout ➜]"
+                    Command="{Binding LogoutCommand, ElementName=HomePageRoot}"
+                    Style="{StaticResource DangerButton}"
+                    Height="40"
+                    Padding="12,6"
+                    Margin="0"/>
+                        <!-- Explicitly no right margin -->
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+            <!-- MAIN CONTENT -->
 			<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 				<UniformGrid Columns="2" HorizontalAlignment="Stretch">
 
@@ -435,16 +445,17 @@
 					</Grid.ColumnDefinitions>
 
 					<!-- Totals -->
-					<StackPanel Grid.Column="0" HorizontalAlignment="Center">
-						<TextBlock Text="Coins Total" FontSize="12" Foreground="#92400e" FontWeight="SemiBold"/>
-						<TextBlock Text="{Binding CoinTotal, StringFormat='{}{0:F3}'}"
-                                   FontSize="16" FontWeight="Bold" Foreground="#92400e"/>
-					</StackPanel>
 
-					<StackPanel Grid.Column="1" HorizontalAlignment="Center">
+					<StackPanel Grid.Column="0" HorizontalAlignment="Center">
 						<TextBlock Text="Notes Total" FontSize="12" Foreground="#6b21a8" FontWeight="SemiBold"/>
 						<TextBlock Text="{Binding NoteTotal, StringFormat='{}{0:F3}'}"
                                    FontSize="16" FontWeight="Bold" Foreground="#6b21a8"/>
+					</StackPanel>
+                    
+					<StackPanel Grid.Column="1" HorizontalAlignment="Center">
+						<TextBlock Text="Coins Total" FontSize="12" Foreground="#92400e" FontWeight="SemiBold"/>
+						<TextBlock Text="{Binding CoinTotal, StringFormat='{}{0:F3}'}"
+                                   FontSize="16" FontWeight="Bold" Foreground="#92400e"/>
 					</StackPanel>
 
 					<StackPanel Grid.Column="2" HorizontalAlignment="Center">

@@ -9,22 +9,26 @@ namespace Deno.Views
         public ManagePage()
         {
             InitializeComponent();
+
             InitializeWebView();
         }
 
         private async void InitializeWebView()
         {
-            try
+            string auth = GlobalStateService.Instance.Auth;
+            if (auth?.ToLower() == "admin")
             {
-                // Ensure WebView2 is ready
-                await MyWebView.EnsureCoreWebView2Async();
-                string url = GlobalStateService.Instance.DomainName;
+                try
+                {
+                    await MyWebView.EnsureCoreWebView2Async();
+                    string url = GlobalStateService.Instance.DomainName;
        
-                MyWebView.Source = new Uri($"http://{url}");
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show("WebView2 failed: " + ex.Message);
+                    MyWebView.Source = new Uri($"http://{url}");
+                }
+                catch (Exception ex)
+                {
+                   
+                }
             }
         }
     }

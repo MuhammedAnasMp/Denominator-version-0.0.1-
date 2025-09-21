@@ -131,7 +131,6 @@ namespace Deno.Views
             else if (PrinterComboBox.Items.Count > 0)
             {
                 // Fallback: select first available printer
-                MessageBox.Show(savedPrinter, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 PrinterComboBox.SelectedIndex = 0;
                 GlobalStateService.Instance.PrinterName = PrinterComboBox.SelectedItem.ToString();
                 GlobalStateService.Instance.SaveSettings();
