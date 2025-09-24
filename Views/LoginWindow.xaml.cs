@@ -3,11 +3,13 @@ using Deno.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Deployment.Application;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows;
@@ -19,7 +21,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Deployment.Application;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 namespace Deno.Views
 {
@@ -34,21 +35,43 @@ namespace Deno.Views
         {
             InitializeComponent();
         }
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             UsernameBox.Focus();
-            
 
-            if (ApplicationDeployment.IsNetworkDeployed)
+            try
             {
-                var publishVersion = ApplicationDeployment.CurrentDeployment.CurrentVersion;
-                VersionTextBlock.Text = "Version: " + publishVersion.ToString();
-            }
-            else
-            {
-                VersionTextBlock.Text = "Version In Development";
-            }
+                if (ApplicationDeployment.IsNetworkDeployed && ApplicationDeployment.CurrentDeployment != null)
+                {
+                    var deployment = ApplicationDeployment.CurrentDeployment;
+                    var publishVersion = deployment.CurrentVersion;
 
+                    // Retry if version is 0.0.0.0 (ClickOnce initialization delay)
+                    if (publishVersion.ToString() == "0.0.0.0")
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            await Task.Delay(1000); // Async 1-second delay
+                            publishVersion = deployment.CurrentVersion;
+                            if (publishVersion.ToString() != "0.0.0.0")
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    VersionTextBlock.Text = $"Version: {publishVersion}";
+                }
+                else
+                {
+                    VersionTextBlock.Text = "Version: In Development";
+                }
+            }
+            catch (Exception ex)
+            {
+                VersionTextBlock.Text = "Version: Unknown (Error retrieving version)";
+                Console.WriteLine($"Error retrieving version: {ex.Message}\nStackTrace: {ex.StackTrace}");
+            }
         }
 
         private void UsernameBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

@@ -31,7 +31,19 @@
 			<Setter Property="Margin" Value="1"/>
 		</Style>
 
-		<!-- Modern Button Style -->
+
+        <Storyboard x:Key="BlinkStoryboard" RepeatBehavior="1:0:0">
+            <ColorAnimation
+        Storyboard.TargetName="HelpButton"
+        Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+        From="LightGreen"
+        To="Green"
+        Duration="0:0:2"     
+                AutoReverse="True"
+        RepeatBehavior="Forever" />
+        </Storyboard>
+
+        <!-- Modern Button Style -->
 		<Style x:Key="ModernButton" TargetType="Button">
 			<Setter Property="Background" Value="#4f46e5"/>
 			<Setter Property="Foreground" Value="White"/>
@@ -188,11 +200,22 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Margin="0">
                         <!-- Help Us Button -->
-                        <Button Content="Help 📩" 
-                    Height="40" 
-                    Style="{StaticResource SuccessButton}"
-                    Padding="12,6"
-                    Margin="0,0,8,0" Click="OpenPopup_Click"/>
+                        <Button x:Name="HelpButton"
+                Content="Support 📩"
+                Height="40"
+                Width="120"
+                Padding="12,6"
+                                 Click="OpenPopup_Click"
+                Margin="10"
+                  Style="{StaticResource DangerButton}"               
+                Background="LightGreen">
+                            <Button.Triggers>
+                                <!-- Start blinking automatically when page loads -->
+                                <EventTrigger RoutedEvent="Button.Loaded">
+                                    <BeginStoryboard Storyboard="{StaticResource BlinkStoryboard}" />
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
                         <!-- 8-pixel gap to the right -->
                         <!-- Logout Button (last, furthest to the right) -->
                         <Button Content="Logout ➜]"
