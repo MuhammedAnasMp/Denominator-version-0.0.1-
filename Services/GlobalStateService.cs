@@ -21,7 +21,7 @@ namespace Deno.Services
         private string _auth = "";
         private string _locName = "";
         private string _deveIp = "";
-        private double _openingAmount = 0;
+        private string _openingAmount = "";
 
         public string DeveIp
         {
@@ -41,11 +41,10 @@ namespace Deno.Services
             set { _locCode = value ?? ""; OnPropertyChanged(nameof(LocCode)); }
         }
 
-        public double OpeningAmount
+        public string OpeningAmount
         {
             get => _openingAmount;
-            set { _openingAmount = value ;      
-           OnPropertyChanged(nameof(OpeningAmount)); }
+            set { _openingAmount = value ?? ""; OnPropertyChanged(nameof(LocCode)); }
         }
         public string PrinterName
         {
@@ -160,7 +159,7 @@ namespace Deno.Services
                     UserId = settings.UserId ?? "";
                     Auth = settings.Auth ?? "";
                     DeveIp = settings.DevIp ?? "";
-                    OpeningAmount = (settings.OpeningAmount != 0) ? settings.OpeningAmount : 110;
+                    OpeningAmount = settings.OpeningAmount ?? "110";
 
 
                 }
@@ -177,7 +176,7 @@ namespace Deno.Services
                     UserId = "";
                     Auth = "";
                     DeveIp = "";
-                    OpeningAmount = 110;
+                    OpeningAmount = "110";
 
                 }
             }
@@ -193,7 +192,7 @@ namespace Deno.Services
                 Username = "";
                 UserId = "";
                 Auth = "";
-                OpeningAmount = 110;
+                OpeningAmount = "110";
                 throw; // Re-throw to let caller handle
             }
         }
@@ -212,6 +211,6 @@ namespace Deno.Services
         public string UserId { get; set; }
         public string Auth { get; set; }
         public string PrinterName { get; set; }
-        public double OpeningAmount { get; set; }
+        public string OpeningAmount { get; set; }
     }
 }

@@ -411,13 +411,13 @@
 
                                         <!-- Input for Initial Amount -->
                                         <TextBox Grid.Column="1"
-				Margin="8,0"
-				Text="{Binding InitialAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                            <TextBox.Style>
-                                                <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
-                                                 
-                                                    <Setter Property="IsEnabled" 
-														Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
+											Margin="8,0"
+											Text="{Binding InitialAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+														<TextBox.Style>
+															<Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+																<Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+																<Setter Property="IsEnabled" 
+															Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
 
                                                     <!-- Red border -->
                                                     <Setter Property="BorderBrush" Value="#FF5600"/>
