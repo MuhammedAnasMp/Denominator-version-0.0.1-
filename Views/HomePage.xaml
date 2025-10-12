@@ -415,8 +415,8 @@
 											Text="{Binding InitialAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 														<TextBox.Style>
 															<Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
-																<Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
-																<Setter Property="IsEnabled" 
+                                                    <Setter Property="local:NumericValidationBehavior.IsEnabled" Value="True"/>
+                                                    <Setter Property="IsEnabled" 
 															Value="{Binding DataContext.EditMod, ElementName=HomePageRoot, Converter={StaticResource InverseBooleanConverter}}"/>
 
                                                     <!-- Red border -->

@@ -49,7 +49,7 @@ namespace Deno.Views
             _username = username;
 
             _currencyService.InitialAmount = decimal.TryParse(GlobalStateService.Instance.OpeningAmount, out var openingAmount) ? openingAmount : 0m;
-           
+
             WelcomeText = $"Welcome, {username}!";
             DataContext = _currencyService;
             this.SetValue(WelcomeTextProperty, WelcomeText);
