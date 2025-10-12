@@ -100,9 +100,9 @@ namespace Deno.Services
             }
         }
 
-        private decimal _initialAmount;
+        private double _initialAmount;
 
-        public decimal InitialAmount
+        public double InitialAmount
         {
             get => _initialAmount;
             set
@@ -654,7 +654,7 @@ namespace Deno.Services
         private async void PostToApi(object parameter)
         {
            
-         
+
             try
             {
                 if (EditMod)
@@ -889,7 +889,6 @@ namespace Deno.Services
                         return null;
                     }
 
-
                     if (GrandTotal == 0)
                     {
                         MessageBox.Show("Please enter the quantity for each coin and note.",
@@ -1078,7 +1077,7 @@ namespace Deno.Services
 
 
             [JsonPropertyName("opening_amount")]
-            public int OpeningAmount { get; set; }
+            public double OpeningAmount { get; set; }
         }
 
 

@@ -48,8 +48,8 @@ namespace Deno.Views
             _currencyService = currencyService;
             _username = username;
 
-            _currencyService.InitialAmount = decimal.TryParse(GlobalStateService.Instance.OpeningAmount, out var openingAmount) ? openingAmount : 0m;
-           
+            _currencyService.InitialAmount = GlobalStateService.Instance.OpeningAmount > 0 ? GlobalStateService.Instance.OpeningAmount : 0.0;
+
             WelcomeText = $"Welcome, {username}!";
             DataContext = _currencyService;
             this.SetValue(WelcomeTextProperty, WelcomeText);
@@ -131,7 +131,7 @@ namespace Deno.Views
                     var userId = _globalStateService.UserId;
                     var locCode = _globalStateService.LocCode;
                     var response = await client.GetAsync($"http://{host}/existing_history?Id=0&LocCode={locCode}&UserId={userId}");
-                   
+
                     if (response.IsSuccessStatusCode)
                     {
                         var responseContent = await response.Content.ReadAsStringAsync();
