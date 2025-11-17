@@ -827,37 +827,37 @@ namespace Deno.Services
             {
                 if (EditMod)
                 {
-                    //var authDialog = new AuthDialog();
-                    //if (authDialog.ShowDialog() != true)
-                    //{
-                    //    //MessageBox.Show("Authentication cancelled.");
-                    //    return;
-                    //}
+                    var authDialog = new AuthDialog();
+                    if (authDialog.ShowDialog() != true)
+                    {
+                        //MessageBox.Show("Authentication cancelled.");
+                        return;
+                    }
 
-                    //string password = authDialog.Password;
+                    string password = authDialog.Password;
 
 
-                    //var loginSuccess = await ValidateManagerCredentials(authDialog.Id, password);
+                    var loginSuccess = await ValidateManagerCredentials(authDialog.Id, password);
 
-                    //if (loginSuccess == null || loginSuccess.Status != 200)
-                    //{
-                    //    //MessageBox.Show("Authentication failed");
-                    //    return;
-                    //}
+                    if (loginSuccess == null || loginSuccess.Status != 200)
+                    {
+                        //MessageBox.Show("Authentication failed");
+                        return;
+                    }
 
-                    //if (loginSuccess.Auth == "CASHIER")
-                    //{
-                    //    MessageBox.Show("Supervisor ID is required to update denomination");
-                    //    return;
-                    //}
+                    if (loginSuccess.Auth == "CASHIER")
+                    {
+                        MessageBox.Show("Supervisor ID is required to update denomination");
+                        return;
+                    }
 
-                    //if (loginSuccess.Auth == "INVALID")
-                    //{
-                    //    MessageBox.Show("Invalid login credentials");
-                    //    return;
-                    //}
-                    //AuthorizedBy = loginSuccess.Id;
-                    AuthorizedBy = 786;
+                    if (loginSuccess.Auth == "INVALID")
+                    {
+                        MessageBox.Show("Invalid login credentials");
+                        return;
+                    }
+                    AuthorizedBy = loginSuccess.Id;
+
                     EditMod = false;
                     return;
                 }
