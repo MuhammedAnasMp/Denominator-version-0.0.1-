@@ -48,7 +48,7 @@ namespace Deno.Views
             _currencyService = currencyService;
             _username = username;
 
-            _currencyService.InitialAmount = decimal.TryParse(GlobalStateService.Instance.OpeningAmount, out var openingAmount) ? openingAmount : 0m;
+            _currencyService.InitialAmount = float.TryParse(GlobalStateService.Instance.OpeningAmount, out var openingAmount) ? openingAmount : 0;
 
             WelcomeText = $"Welcome, {username}!";
             DataContext = _currencyService;

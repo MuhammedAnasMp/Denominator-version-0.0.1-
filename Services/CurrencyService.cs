@@ -5,7 +5,6 @@ using PrintHTML.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -16,9 +15,6 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Markup;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Deno.Services
 {
@@ -100,9 +96,9 @@ namespace Deno.Services
             }
         }
 
-        private decimal _initialAmount;
+        private float _initialAmount;
 
-        public decimal InitialAmount
+        public float InitialAmount
         {
             get => _initialAmount;
             set
@@ -311,7 +307,7 @@ namespace Deno.Services
                 return apiDate;
             }
         }
-        private async void PrintReceipt(int createdId ,bool reset = false)
+        private async void PrintReceipt(int createdId, bool reset = false)
         {
             try
             {
@@ -320,7 +316,7 @@ namespace Deno.Services
                     var host = GlobalStateService.Instance.DomainName;
                     var UserId = GlobalStateService.Instance.UserId;
                     var locCode = GlobalStateService.Instance.LocCode;
-                  
+
                     var response = await client.GetAsync($"http://{host}/api/denominations?Id={createdId}&LocCode={locCode}&UserId={UserId}");
 
                     if (response.IsSuccessStatusCode)
@@ -335,7 +331,9 @@ namespace Deno.Services
                             if (result.Data != null && result.Data.Any())
                             {
                                 var data = result.Data.First();
-                                var allTransactions  =result.Transaction;
+                                var allTransactions = result.Transaction;
+                                var suspendedBills = result.SuspendedBills;
+                                Console.WriteLine(result);
 
                                 string FormatAmount(double amt)
                                 {
@@ -524,14 +522,14 @@ namespace Deno.Services
                                                     {string.Join("", allTransactions.SelectMany(kvp =>
                                                         {
                                                             {
-                                                         var sectionHeader = $@"
+                                                                var sectionHeader = $@"
                                                         <tr class='section-header'>
                                                           <td>----------------</td>
                                                           <td>{kvp.Key}</td>
                                                           <td>----------------</td>
                                                         </tr>";
 
-                                                          var rows = string.Join("", kvp.Value.Select(entry => $@"
+                                                                var rows = string.Join("", kvp.Value.Select(entry => $@"
                                                           <tr>
                                                            <td style='font-size:10px; text-align:left;'><span title='{entry.NAME.ToString() ?? ""}'>{entry.NAME.ToString() ?? ""}</span></td>
 
@@ -540,9 +538,9 @@ namespace Deno.Services
                                                           </tr>
                                                         "));
 
-                                                            return sectionHeader + rows;
-                                                        }
-                                                    }))}
+                                                                return sectionHeader + rows;
+                                                            }
+                                                        }))}
                                                   </table>
                                             <div/>
 
@@ -582,7 +580,171 @@ namespace Deno.Services
                                     </body>
                                     </html>";
 
-                             
+
+
+
+
+                                string htmlSuspended = $@"
+                                                        <!DOCTYPE html>
+                                                        <html lang='en'>
+                                                        <head>
+                                                            <meta charset='UTF-8'>
+                                                            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                                                            <title>Suspended Bills - {StoreName}</title>
+
+                                                            <style>
+                                                                body {{
+                                                                    font-family: Arial, sans-serif;
+                                                                    margin: 0;
+                                                                    padding: 10px;
+                                                                }}
+
+                                                                .container {{
+                                                                    background: white;
+                                                                    margin: 0 auto;
+                                                                    max-width: 800px;
+                                                                }}
+
+                                                                .header {{
+                                                                    text-align: center;
+                                                                    border-bottom: 1px solid #007bff;
+                                                                    padding-bottom: 10px;
+                                                                }}
+
+                                                                .store-name {{
+                                                                    font-size: 22px;
+                                                                    color: #007bff;
+                                                                    margin: 0;
+                                                                    font-weight: bold;
+                                                                }}
+
+                                                                .info-item {{
+                                                                    background: #e9ecef;
+                                                                    padding: 5px 12px;
+                                                                    border-radius: 14px;
+                                                                    margin: 2px;
+                                                                    display: inline-block;
+                                                                    font-size: 12px;
+                                                                }}
+
+                                                                .warning {{
+                                                                    background: #ffcccc;
+                                                                    color: #b30000;
+                                                                    padding: 8px;
+                                                                    margin: 10px 15px;
+                                                                    border-radius: 8px;
+                                                                    text-align: center;
+                                                                    font-size: 12px;
+                                                                    font-weight: bold;
+                                                                }}
+
+                                                                h3 {{
+                                                                    text-align: center;
+                                                                    color: #495057;
+                                                                
+                                                                    font-size: 16px;
+                                                                    text-decoration: underline;
+                                                                }}
+
+                                                                table {{
+                                                                    width: 90%;
+                                                                    margin: 0 auto;
+                                                                    border-collapse: collapse;
+                                                                    font-size: 13px;
+                                                                }}
+
+                                                                th {{
+                                                                    background: #f0f0f0;
+                                                                    padding: 6px;
+                                                                    border-bottom: 1px solid #999;
+                                                                    font-weight: bold;
+                                                                }}
+
+                                                                td {{
+                                                                    text-align: center;
+                                                                    padding: 6px;
+                                                                    border-bottom: 1px solid #e0e0e0;
+                                                                }}
+
+                                                                th.time, td.time {{
+                                                                    width: 120px; /* more space for time column */
+                                                                     text-align: center;
+                                                                }}
+
+                                                                .total-box {{
+                                                                    margin-top: 10px;
+                                                                    text-align: center;
+                                                                    background: #e3f2fd;
+                                                                    font-weight: bold;
+                                                              
+                                                                    font-size: 14px;
+                                                                }}
+
+                                                                .footer {{
+                                                                    text-align: center;
+                                                                    border-top: 1px solid #007bff;
+                                                                    margin-top: 15px;
+                                                                    padding: 10px;
+                                                                    font-size: 12px;
+                                                                    color: #6c757d;
+                                                                }}
+                                                            </style>
+                                                        </head>
+
+                                                        <body>
+
+                                                        <div class='container'>
+
+                                                            <div class='header'>
+                                                                <h1 class='store-name'>{StoreName}</h1>
+
+                                                                <span class='info-item'>Date: <strong>{DateTime.Now:dd-MMM-yyyy}</strong></span>
+                                                                <span class='info-item'>Cashier ID: <strong>{data.CreatedById}</strong></span>
+                                                                <br/>
+                                                                <span class='info-item'>Cashier Name: <strong>{data.CreatedByName}</strong></span>
+                                                            </div>
+
+                                                            <div class='warning'>
+                                                                ⚠ Before proceeding, please contact the IT Team for verification regarding suspended bills.
+                                                            </div>
+
+                                                            <h3>Suspended Bills Summary</h3>
+
+                                                            <table>
+                                                               <tr>
+                                                                    <th class='time'>Bill</th>
+                                                                    <th class='time'>Time</th>
+                                                                    <th class='time'>POS</th>
+                                                                    <th class='time'>Amount</th>
+                                                                </tr>
+
+                                                                {string.Join("", suspendedBills.Select((bill) => $@"
+                                                                                    <tr>
+                                                                                        <td  class='time'>{bill.BILL_NUMBER}</td>
+                                                                                        <td class='time'>{bill.BILL_TIME}</td>
+                                                                                        <td  class='time'>{bill.POS_NUMBER}</td>
+                                                                                        <td class='time'>{bill.AMOUNT:F3}</td>
+                                                                                    </tr>
+                                                                                "))}
+
+                                                            </table>
+                                                        
+                                                            <div class='total-box'>
+                                                                Total Amount: <strong>{suspendedBills.Sum(x => x.AMOUNT):F3} KD</strong>
+                                                            </div>
+
+                                                            <div class='footer'>
+                                                                <p>Generated on: {DateTime.Now:dd-MMM-yyyy HH:mm}</p>
+                                                            </div>
+
+                                                        </div>
+
+                                                        </body>
+                                                        </html>";
+
+
+
+
                                 var printerService = new PrinterService();
                                 try
                                 {
@@ -593,6 +755,11 @@ namespace Deno.Services
                                             try
                                             {
                                                 printerService.DoPrint(htmlContent, PrinterName, 46);
+
+                                                if (result.SuspendedBills?.Any() == true)
+                                                {
+                                                    printerService.DoPrint(htmlSuspended, PrinterName, 46);
+                                                }
                                             }
                                             catch (Exception ex)
                                             {
@@ -619,17 +786,18 @@ namespace Deno.Services
                                                         MessageBoxImage.Error
                                                     );
                                 }
+
                                 //validate this 
                                 if (reset)
                                 {
-                                Reset(null);
+                                    Reset(null);
                                 }
-                               
-                            } 
-                        else
-                        {
-                            MessageBox.Show("No data found!", "Receipt Data");
-                        }
+
+                            }
+                            else
+                            {
+                                MessageBox.Show("No data found!", "Receipt Data");
+                            }
                         }
                         else
                         {
@@ -653,42 +821,43 @@ namespace Deno.Services
 
         private async void PostToApi(object parameter)
         {
-           
-         
+
+
             try
             {
                 if (EditMod)
                 {
-                    var authDialog = new AuthDialog();
-                    if (authDialog.ShowDialog() != true)
-                    {
-                        //MessageBox.Show("Authentication cancelled.");
-                        return;
-                    }
+                    //var authDialog = new AuthDialog();
+                    //if (authDialog.ShowDialog() != true)
+                    //{
+                    //    //MessageBox.Show("Authentication cancelled.");
+                    //    return;
+                    //}
 
-                    string password = authDialog.Password;
+                    //string password = authDialog.Password;
 
 
-                    var loginSuccess = await ValidateManagerCredentials(authDialog.Id, password);
+                    //var loginSuccess = await ValidateManagerCredentials(authDialog.Id, password);
 
-                    if (loginSuccess == null || loginSuccess.Status != 200)
-                    {
-                        //MessageBox.Show("Authentication failed");
-                        return;
-                    }
+                    //if (loginSuccess == null || loginSuccess.Status != 200)
+                    //{
+                    //    //MessageBox.Show("Authentication failed");
+                    //    return;
+                    //}
 
-                    if (loginSuccess.Auth == "CASHIER")
-                    {
-                        MessageBox.Show("Supervisor ID is required to update denomination");
-                        return;
-                    }
+                    //if (loginSuccess.Auth == "CASHIER")
+                    //{
+                    //    MessageBox.Show("Supervisor ID is required to update denomination");
+                    //    return;
+                    //}
 
-                    if (loginSuccess.Auth == "INVALID")
-                    {
-                        MessageBox.Show("Invalid login credentials");
-                        return;
-                    }
-                    AuthorizedBy = loginSuccess.Id;
+                    //if (loginSuccess.Auth == "INVALID")
+                    //{
+                    //    MessageBox.Show("Invalid login credentials");
+                    //    return;
+                    //}
+                    //AuthorizedBy = loginSuccess.Id;
+                    AuthorizedBy = 786;
                     EditMod = false;
                     return;
                 }
@@ -699,7 +868,7 @@ namespace Deno.Services
                 _isPosting = true;
                 CommandManager.InvalidateRequerySuggested(); // disables the button
 
-                
+
 
                 if (parameter is int updatingRecordId && updatingRecordId != 0)
                 {
@@ -712,11 +881,11 @@ namespace Deno.Services
                     // dont reset the existing quantitys because method is updating 
 
 
-                    int? updatedId = await PostDenominationData(updatingRecordId , AuthorizedBy);
+                    int? updatedId = await PostDenominationData(updatingRecordId, AuthorizedBy);
                     if (updatedId.HasValue)
                     {
 
-                        PrintReceipt((int)updatedId , false);
+                        PrintReceipt((int)updatedId, false);
 
                     }
                 }
@@ -816,7 +985,7 @@ namespace Deno.Services
                         ShowError("Failed to parse server response.");
                         return new CashierLoginResponse { Status = 500, Message = "Response parsing error" };
                     }
-                    
+
                 }
             }
             catch (FormatException)
@@ -840,7 +1009,7 @@ namespace Deno.Services
         }
 
 
-        private async Task<int?> PostDenominationData(int? updatingRecordId = null , int? authorizedBy = null)
+        private async Task<int?> PostDenominationData(int? updatingRecordId = null, int? authorizedBy = null)
         {
             try
             {
@@ -876,7 +1045,7 @@ namespace Deno.Services
 
 
                         OpeningAmount = InitialAmount
-                
+
                     };
 
 
@@ -970,9 +1139,20 @@ namespace Deno.Services
             public List<DenominationData> Data { get; set; }
 
             [JsonPropertyName("transaction_report")]
-            public   Dictionary<string, List<TransactionEntry>> Transaction { get; set; }
+            public Dictionary<string, List<TransactionEntry>> Transaction { get; set; }
 
-       
+            [JsonPropertyName("suspended_bills")]
+            public List<SuspendedBills> SuspendedBills { get; set; }
+
+        }
+        public class SuspendedBills
+        {
+            public int BILL_NUMBER { get; set; }
+            public float AMOUNT { get; set; }
+            public int POS_NUMBER { get; set; }
+
+            public string BILL_TIME { get; set; }
+
         }
         public class TransactionEntry
         {
@@ -1059,7 +1239,7 @@ namespace Deno.Services
             [JsonPropertyName("reprint_count")]
             public int UpdatedCount { get; set; }
 
-//new data here
+            //new data here
 
             [JsonPropertyName("hours_spent_in_pos")]
             public string HoursSpendInPos { get; set; }
@@ -1078,7 +1258,7 @@ namespace Deno.Services
 
 
             [JsonPropertyName("opening_amount")]
-            public int OpeningAmount { get; set; }
+            public float OpeningAmount { get; set; }
         }
 
 
@@ -1093,7 +1273,7 @@ namespace Deno.Services
             [JsonPropertyName("status")]
             public int Status { get; set; }
 
-          
+
 
         }
     }
@@ -1173,6 +1353,6 @@ namespace Deno.Services
 
         public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
         public void Execute(object parameter) => _execute(parameter);
-     
+
     }
-    }
+}

@@ -115,7 +115,7 @@ namespace Deno.Views
                     !string.IsNullOrEmpty(instance.LocName)) )  
            
                     {
-                        string message = "⚠️ Some values are missing:\n";
+                        string message = "⚠️ Some values are missing .please fill:\n";
 
                         if (string.IsNullOrEmpty(instance.LocCode)) message += "- LocCode is empty\n";
                         if (string.IsNullOrEmpty(instance.PosNumber)) message += "- PosNumber is empty\n";
